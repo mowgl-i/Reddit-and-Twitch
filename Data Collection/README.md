@@ -12,6 +12,10 @@ Check if clip is available
  - Returns Clips views at time of scrape
  - Returns CSV of original data(october_clips...)  plus returned values -> Clipscrapev1.csv
  
+if vod is available, then we can use [lay295's](https://github.com/lay295/TwitchDownloader) nifty twich downloader. 
+ - It will grab video of VODs and Clips
+ - It will grab chat of VODS and Clips
+ 
  
 ## Reddit Related Files
 
