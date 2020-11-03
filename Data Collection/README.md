@@ -1,3 +1,8 @@
+
+During the data collection many streamers opted to delete VODS and clips due to the current DMCA climate on Twitch.
+This interupped data collection and the end result was chat messages from 227 Clips. 
+
+
 # File Discriptions
 
 

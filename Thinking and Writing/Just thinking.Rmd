@@ -1,0 +1,58 @@
+---
+title: "Thinking and Writing"
+author: "Michael Puerto"
+date: "11/2/2020"
+output: html_document
+---
+
+```{r, include=FALSE}
+library(pacman)
+p_load(tidyverse)
+
+setwd("~/MSIA-19/Git/Reddit-and-Twitch")
+clips = read_csv("~/MSIA-19/Git/Reddit-and-Twitch/Data Collection/ClipscrapeV1.csv")
+
+```
+
+Course Project Components
+
+  Descriptive Statistics (minimum of 5)
+--------------------
+ - Most Frequent Terms - Emotes
+ - Most Frequent n-grams - Emotes + Emotes, Emotes plus chat?
+ - Pairwise correlation - Already Done
+ - Sentiment - Not done, have me and my friends rate them?
+ - Topics - Nah
+ - Page metadata - nah
+ - Authors - Users and streamers yes. 
+ - Timestamps/activity - Date of clips?
+ - Views/visits - Views may be important
+ - Genre/site categories - nah
+ - Comparisons (minimum of 5)
+
+Compare among descriptive categories (minimum of 5)
+-------------------
+
+Examples:
+ - Sentiment of comments compared to topics of articles sentiment per streamer, maybe find top 10 toxic and positive users? - prolly lots of ties?
+ - Page views compared to topics or authors - 
+ - Activity within certain time periods compared to topics/authors/sentiments
+ - Compare genres/site categories
+ - Sentiment of bi-grams or common chat spams? 
+  
+
+Report
+-------------------
+
+Markdown report using R markdown or Python notebooks
+Literate programming
+Reproducible
+The 10 descriptions and comparisons listed above should each have their own visualization
+  Dashboard (optional replacement for "Report")
+
+R Shiny dashboards, or another "dashboard" tool
+Publicly accessible via web browser
+Markdown documentation required (GitHub)
+Grading
+
+The course project is assessed and graded during the "Final Presentation." The final presentation has 2 main components. The first component is the presentation itself, which provides students the opportunity to share their report or dashboard. The second component of the "presentation" is the project itself, which is graded when the instructor assesses the data, code, and report/dashboard produced by the students. 

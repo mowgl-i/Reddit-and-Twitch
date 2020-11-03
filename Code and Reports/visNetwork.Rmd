@@ -1,0 +1,57 @@
+---
+title: "Playing with vizNetwork"
+author: "Michael Puerto"
+date: "11/2/2020"
+output: html_document
+---
+
+```{r}
+library(pacman)
+p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork)
+
+
+file_names = dir("C:/Users/macia/Documents/twitch_clips/October Clips")
+
+G_path = "C:/Users/macia/Documents/twitch_clips/October Clips/"
+data = NULL
+
+
+for(i in file_names){
+  L_path = paste(G_path,as.character(i),sep = "")
+  data_temp <- fromJSON(as.character(L_path))
+  
+  chat_temp <- data_temp$comments$message$body
+  user_temp <- data_temp$comments$commenter$display_name
+  date_temp <- data_temp$comments$commenter$created_at
+  streamer_temp <- data_temp$streamer$name
+  
+  #------------- This was me tyring to pull out the user bages ( Moderator/subcriber etc..)
+  # for(i in 1:length(data_temp$comments$message$user_badges)){
+  #  id_temp = list(data_temp$comments$message$user_badges[[i]]$`_id`)
+  #  id = c(test,id_temp)
+    
+    
+   # }
+  
+  data_temp = data.frame("body"= chat_temp,"user"=user_temp,"date"=date_temp,"streamer" = streamer_temp, stringsAsFactors = F)
+  #assign(paste(i,"data",sep = "_"),data_temp) # this will create new dataframes in the environment
+  data = bind_rows(data,data_temp)
+
+}
+
+
+data %>% glimpse()
+
+```
+
+
+```{r}
+
+#Example
+
+nodes <- data.frame(id = 1:3)
+edges <- data.frame(from = c(1,2), to = c(1,3))
+visNetwork(nodes, edges, width = "100%")
+
+```
+
