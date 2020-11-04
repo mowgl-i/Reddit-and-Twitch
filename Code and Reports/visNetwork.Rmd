@@ -7,7 +7,7 @@ output: html_document
 
 ```{r}
 library(pacman)
-p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork)
+p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork,igraph,ggraph)
 
 
 file_names = dir("C:/Users/macia/Documents/twitch_clips/October Clips")
@@ -45,13 +45,59 @@ data %>% glimpse()
 ```
 
 
-```{r}
 
-#Example
+```{r,fig.width=10,fig.height=10}
 
-nodes <- data.frame(id = 1:3)
-edges <- data.frame(from = c(1,2), to = c(1,3))
-visNetwork(nodes, edges, width = "100%")
+tokens <- data %>%
+  unnest_tokens(word,body)%>% 
+  anti_join(stop_words)%>% 
+  filter(str_detect(word,"^[:alpha:]"))
+
+word_cors <- tokens %>%
+  group_by(word) %>%
+  filter(n() >= 10 ) %>%
+  pairwise_cor(word, streamer, sort = T)#, sort = TRUE)
+
+
+top_10 <-word_cors %>% mutate("streamer" = case_when(
+  item2 == "trainwreckstv" ~ "trainwreckstv",
+  item2 == "esfandtv" ~ "esfandtv",
+  item2 == "forsen" ~ "forsen",
+  item2 == "mizkif" ~ "mizkif",
+  item2 == "ludwig" ~ "ludwig",
+  item2 == "moonmoon" ~ "moonmoon",
+  item2 == "xqcow" ~ "xqcow",
+  item2 == "sykkuno" ~ "sykkuno",
+  item2 == "vadikus007" ~ "vadikus007",
+  item2 == "loltyler1" ~ "loltyler1",
+  TRUE ~ "WHO?"
+)) # there are 83 unique streamers in the dataset, we should filter this some how. Either top 20, or maybe with chats > 100. 
+# Build a scraper that grabes the names of emotes for eache of the streamers?
+
+
+test<-top_10 %>%
+  group_by(streamer) %>% top_n(10,wt = correlation) %>%
+  graph_from_data_frame()# %>%
+ # ggraph(layout = "fr") +
+ # geom_edge_link(aes(edge_alpha = correlation), show.legend = FALSE) +
+ #  geom_node_point(aes(color = streamer), size = 5) +
+ #  geom_node_text(aes(label = name), repel = TRUE) +
+ #  theme_void()
+
+  
+  
+test_viz <- toVisNetworkData(test)
+
+visNetwork(nodes = test_viz$nodes, edges = test_viz$edges)%>%
+  visNodes(color = as.factor(test_viz$edges$streamer))%>%
+  visOptions(highlightNearest = list(enabled = T, hover = T),nodesIdSelection = T)
 
 ```
+
+
+What I need to do, I'd like to show, all the popular emotes that are shared among the streamers. 
+- I need to filter the text to only include emotes,
+- Or I can have the emotes correlated with streamers, and the text associated with the emote!?
+
+- Will i need to do this manually?
 
