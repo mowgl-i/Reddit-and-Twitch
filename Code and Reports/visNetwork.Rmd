@@ -100,4 +100,6 @@ What I need to do, I'd like to show, all the popular emotes that are shared amon
 - Or I can have the emotes correlated with streamers, and the text associated with the emote!?
 
 - Will i need to do this manually?
+- Frankerfacez seems like it can be scraped. 
+- BTTV written in js. 
 
