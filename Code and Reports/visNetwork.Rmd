@@ -2,7 +2,9 @@
 title: "Playing with vizNetwork"
 author: "Michael Puerto"
 date: "11/2/2020"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r}
@@ -59,7 +61,7 @@ emote_data <- emote_data_ffz %>% full_join(emote_data_bttv, by = "emote_name") %
 
 
 
-```{r}
+```{r, fig.width= 12, fig.height= 12}
 
 tokens <- data %>%
   unnest_tokens(word,body)%>% 
@@ -105,15 +107,15 @@ test<-top_10 %>%
 
 
 streamers = c("trainwreckstv","esfandtv","forsen","mizkif","ludwig","moonmoon","xqcow","sykkuno","vadikus007","loltyler1")
+
 test_viz <- toVisNetworkData(test)
-test_viz$nodes <- test_viz$nodes %>% mutate("group" = case_when(
-  label %in% streamers ~ "Streamer",
-  TRUE ~ "Emote"))
+
+test_viz$nodes <- test_viz$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"))
 #test_viz checking the dataframe
 visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
   visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
   visGroups(groupname = "Emote", color = "blue")%>%
-  visOptions(highlightNearest = list(enabled = T, hover = T),nodesIdSelection = T)%>%
+  visOptions(highlightNearest = list(enabled = T, hover = T))%>%
   visLegend()
 
 #emote_data
