@@ -45,22 +45,34 @@ data %>% glimpse()
 ```
 
 
+```{r}
 
-```{r,fig.width=10,fig.height=10}
+emote_data_bttv <- read_csv('C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/bttv_emotes.csv') 
+emote_data_ffz <- read_csv('C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/ffz_emotes.csv')
+
+emote_data <- emote_data_ffz %>% full_join(emote_data_bttv, by = "emote_name") %>% select(-c(X1.x,X1.y)) %>% distinct(emote_name,.keep_all = T)%>% 
+  mutate(emote_name = str_to_lower(emote_name))
+
+```
+
+
+
+
+
+```{r}
 
 tokens <- data %>%
   unnest_tokens(word,body)%>% 
-  anti_join(stop_words)%>% 
   filter(str_detect(word,"^[:alpha:]"))
+
 
 word_cors <- tokens %>%
   group_by(word) %>%
   filter(n() >= 10 ) %>%
   pairwise_cor(word, streamer, sort = T)#, sort = TRUE)
 
-
 top_10 <-word_cors %>% mutate("streamer" = case_when(
-  item2 == "trainwreckstv" ~ "trainwreckstv",
+  item2 == "trainwreckstv" ~ "trainwreckstv", # ahh, 
   item2 == "esfandtv" ~ "esfandtv",
   item2 == "forsen" ~ "forsen",
   item2 == "mizkif" ~ "mizkif",
@@ -75,7 +87,13 @@ top_10 <-word_cors %>% mutate("streamer" = case_when(
 # Build a scraper that grabes the names of emotes for eache of the streamers?
 
 
+#top_10 %>% group_by(streamer) %>% count() # strange numbers here, each streamer has same number?, because I filteer for top 10 above?
+ # from 2 mil rows
+ # to about 2k rows
 test<-top_10 %>%
+  mutate(contains_emote = case_when(item1 %in% emote_data$emote_name ~ 1, TRUE ~ 0)) %>% 
+  filter(contains_emote == 1) %>% # filtering for only emotes!
+  filter(streamer != "WHO?")%>%
   group_by(streamer) %>% top_n(10,wt = correlation) %>%
   graph_from_data_frame()# %>%
  # ggraph(layout = "fr") +
@@ -84,13 +102,33 @@ test<-top_10 %>%
  #  geom_node_text(aes(label = name), repel = TRUE) +
  #  theme_void()
 
-  
-  
-test_viz <- toVisNetworkData(test)
 
-visNetwork(nodes = test_viz$nodes, edges = test_viz$edges)%>%
-  visNodes(color = as.factor(test_viz$edges$streamer))%>%
-  visOptions(highlightNearest = list(enabled = T, hover = T),nodesIdSelection = T)
+
+streamers = c("trainwreckstv","esfandtv","forsen","mizkif","ludwig","moonmoon","xqcow","sykkuno","vadikus007","loltyler1")
+test_viz <- toVisNetworkData(test)
+test_viz$nodes <- test_viz$nodes %>% mutate("group" = case_when(
+  label %in% streamers ~ "Streamer",
+  TRUE ~ "Emote"))
+#test_viz checking the dataframe
+visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
+  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
+  visGroups(groupname = "Emote", color = "blue")%>%
+  visOptions(highlightNearest = list(enabled = T, hover = T),nodesIdSelection = T)%>%
+  visLegend()
+
+#emote_data
+
+# Now need to figure out which words are related to the emotes? 
+
+#path_to_images <- "https://raw.githubusercontent.com/datastorm-open/datastorm-open.github.io/master/visNetwork/data/img/indonesia/"
+#data.frame(id = 1:4, 
+#                    shape = c("image", "circularImage"),
+#                    image = paste0(path_to_images, 1:4, ".png"),
+#                    label = "I'm an image")
+
+# Now I need to download the images? build a scraper to download images
+
+
 
 ```
 
