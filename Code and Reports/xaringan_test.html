@@ -40,8 +40,6 @@ background-image: url(https://pbs.twimg.com/profile_images/1282742405616357378/i
 
 
 
-???
-
 Image credit: [LSF Twitter](https://twitter.com/rlivestreamfail)
 
 ---
@@ -56,17 +54,191 @@ class: inverse, center, middle
 # Using Python, R and Bigquery
 
 - Python
-  * used this to interact with PRAW (The Python Reddit API) that grabbed 'current' posts
+  * used this to interact with PRAW (The Python Reddit API) that grabbed 'current' posts.
+  * This data is used in the emote(companion) analysis
 
 
 - R
   * Used to interact with BigqueryR to pull data from the Pushshift reddit dataset which contained historical data from '16. 
+  * Collected Reddit posts and Reddit Comments
+  
 
+---
 
+## LSF Reddit Posts
 
+This is the data that I've collected for reddit posts.
 
 --
 
+
+```r
+glimpse(lsf_data,width = 50)
+```
+
+```
+## Rows: 39,696
+## Columns: 7
+## $ title     [3m[38;5;246m&lt;chr&gt;[39m[23m "PoE streamer gets scared b...
+## $ score     [3m[38;5;246m&lt;dbl&gt;[39m[23m 49, 62, 74, 402, 43, 631, 4...
+## $ url       [3m[38;5;246m&lt;chr&gt;[39m[23m "https://clips.twitch.tv/zi...
+## $ date      [3m[38;5;246m&lt;date&gt;[39m[23m 2016-10-23, 2016-10-01, 20...
+## $ domain    [3m[38;5;246m&lt;chr&gt;[39m[23m "clips.twitch.tv", "oddshot...
+## $ author    [3m[38;5;246m&lt;chr&gt;[39m[23m "spoonducky", "Chandman68",...
+## $ permalink [3m[38;5;246m&lt;chr&gt;[39m[23m "/r/LivestreamFail/comments...
+```
+
+---
+
+## LSF Reddit Posts Comments
+
+This is what the reddit comments look like. 
+--
+
+
+```r
+glimpse(lsf_data_comments,width = 50)
+```
+
+```
+## Rows: 1,416,070
+## Columns: 8
+## $ body      [3m[38;5;246m&lt;chr&gt;[39m[23m "Fake twitch related porn? ...
+## $ name      [3m[38;5;246m&lt;lgl&gt;[39m[23m NA, NA, NA, NA, NA, NA, NA,...
+## $ link_id   [3m[38;5;246m&lt;chr&gt;[39m[23m "t3_4hha9f", "t3_4jdlmz", "...
+## $ date      [3m[38;5;246m&lt;dttm&gt;[39m[23m 2016-05-02 13:25:59, 2016-...
+## $ author    [3m[38;5;246m&lt;chr&gt;[39m[23m "Magnets", "aleco247", "4LT...
+## $ parent_id [3m[38;5;246m&lt;chr&gt;[39m[23m "t1_d2pqffy", "t1_d35wc5v",...
+## $ score     [3m[38;5;246m&lt;dbl&gt;[39m[23m 131, 111, 122, 71, 67, 110,...
+## $ id        [3m[38;5;246m&lt;chr&gt;[39m[23m "d2puk5q", "d35x91t", "d3q5...
+```
+
+---
+
+# Tools used for analyzing the data
+
+
+
+
+
+
+
+---
+class: inverse, center, middle
+
+# Results
+
+---
+
+# Descriptions
+
+### Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated 
+
+
+
+---
+
+1. Most posted Author
+  -
+![](xaringan_test_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+
+---
+
+1. two here.
+  - 
+![](xaringan_test_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+
+
+---
+
+1. three hehre.
+
+  - 
+  
+![](xaringan_test_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+  
+  
+---
+
+1. four here.
+  - 
+  
+![](xaringan_test_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+  
+
+---
+
+1. five here.
+  - 
+![](xaringan_test_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+
+---
+
+1. Six here.
+  - 
+![](xaringan_test_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+---
+
+# Results
+
+### Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated
+
+1. one here.
+  - 
+
+--
+
+1. two here.
+  - 
+
+--
+
+1. three hehre.
+  - 
+
+--
+
+1. four here.
+  - 
+
+--
+
+1. five here.
+  - 
+
+---
+
+# Limitations / Next Steps
+
+1. What are the limitations?
+
+
+1. What next step might you take if you continued pursuing this project?
+
+
+---
+
+# Conclusion
+
+1. Brief concluding statement
+
+1. What weere the big picture taeaaways from your project
+
+1. What have you leearned?
+
+
+
+---
+
+# References
+
+
+---
 You are recommended to use the [RStudio IDE](https://www.rstudio.com/products/rstudio/), but you do not have to.
 
 - Create a new R Markdown document from the menu `File -&gt; New File -&gt; R Markdown -&gt; From Template -&gt; Ninja Presentation`;&lt;sup&gt;1&lt;/sup&gt;
@@ -333,21 +505,21 @@ library(leaflet)
 leaflet() %&gt;% addTiles() %&gt;% setView(-93.65, 42.0285, zoom = 17)
 ```
 
-<div id="htmlwidget-92fd32a9f7fa4a67d83f" style="width:100%;height:432px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-92fd32a9f7fa4a67d83f">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-9cbdae25a00a1a5e5358" style="width:100%;height:432px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-9cbdae25a00a1a5e5358">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}</script>
 
 ---
 
 
 ```r
 DT::datatable(
-  head(iris, 10),
-  fillContainer = FALSE, options = list(pageLength = 8)
+  head(lsf_data, 5),
+  fillContainer = T, options = list(pageLength = 8)
 )
 ```
 
-<div id="htmlwidget-0089dc23b7c217d79dda" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-0089dc23b7c217d79dda">{"x":{"filter":"none","fillContainer":false,"data":[["1","2","3","4","5","6","7","8","9","10"],[5.1,4.9,4.7,4.6,5,5.4,4.6,5,4.4,4.9],[3.5,3,3.2,3.1,3.6,3.9,3.4,3.4,2.9,3.1],[1.4,1.4,1.3,1.5,1.4,1.7,1.4,1.5,1.4,1.5],[0.2,0.2,0.2,0.2,0.2,0.4,0.3,0.2,0.2,0.1],["setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa","setosa"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Sepal.Length<\/th>\n      <th>Sepal.Width<\/th>\n      <th>Petal.Length<\/th>\n      <th>Petal.Width<\/th>\n      <th>Species<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-4929d04766e68e01a60a" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-4929d04766e68e01a60a">{"x":{"filter":"none","fillContainer":true,"data":[["1","2","3","4","5"],["PoE streamer gets scared by his own notification.","OfficialDuckStudios gives pizza delivery driver $25 tip on friends card","Armor from the cosplay contest winner falls off.","Awesome Song Timing - Bikeman Battlefield 1","Path of Exile streamer falls for the good old John Cena"],[49,62,74,402,43],["https://clips.twitch.tv/zizaran/AverageBeaverPMSTwin","https://oddshot.tv/shot/OfficialDuckStudios/Uzo7_Yzk7_ZCH7ZvCjchbzj8","https://clips.twitch.tv/twitch/PowerfulPeafowlSoBayed","https://clips.twitch.tv/bikeman/NiceChickenHeyGuys","https://clips.twitch.tv/pcchild/BetterHerdFunRun"],["2016-10-23","2016-10-01","2016-10-01","2016-10-24","2016-10-08"],["clips.twitch.tv","oddshot.tv","clips.twitch.tv","clips.twitch.tv","clips.twitch.tv"],["spoonducky","Chandman68","MiT_Epona","Meatloaf451","spoonducky"],["/r/LivestreamFail/comments/58y5c3/poe_streamer_gets_scared_by_his_own_notification/","/r/LivestreamFail/comments/55bf4k/officialduckstudios_gives_pizza_delivery_driver/","/r/LivestreamFail/comments/55fv2q/armor_from_the_cosplay_contest_winner_falls_off/","/r/LivestreamFail/comments/5926jf/awesome_song_timing_bikeman_battlefield_1/","/r/LivestreamFail/comments/56hbq9/path_of_exile_streamer_falls_for_the_good_old/"]],"container":"<table class=\"display fill-container\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>title<\/th>\n      <th>score<\/th>\n      <th>url<\/th>\n      <th>date<\/th>\n      <th>domain<\/th>\n      <th>author<\/th>\n      <th>permalink<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 

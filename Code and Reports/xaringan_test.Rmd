@@ -18,11 +18,19 @@ background-image: url(https://pbs.twimg.com/profile_images/1282742405616357378/i
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 
+library(pacman)
+p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork,igraph,ggraph,DT)
+
+
+
+lsf_data = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data.csv")
+
+lsf_data_comments = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data_comments.csv")
+
+lsf_data_comments$date<-as.POSIXct(lsf_data_comments$date,origin = "1970-01-01")
 
 
 ```
-
-???
 
 Image credit: [LSF Twitter](https://twitter.com/rlivestreamfail)
 
@@ -38,12 +46,8 @@ class: inverse, center, middle
 # Using Python, R and Bigquery
 
 - Python
-  * used this to interact with PRAW (The Python Reddit API) that grabbed 'current' posts
-
-```{r}
-
-```
-
+  * used this to interact with PRAW (The Python Reddit API) that grabbed 'current' posts.
+  * This data is used in the emote(companion) analysis
 
 
 - R
@@ -51,13 +55,194 @@ class: inverse, center, middle
   * Collected Reddit posts and Reddit Comments
   
 
-```{r}
+---
+
+## LSF Reddit Posts
+
+This is the data that I've collected for reddit posts.
+
+--
+
+```{r tidy=FALSE}
+
+glimpse(lsf_data,width = 50)
+
+```
+
+---
+
+## LSF Reddit Posts Comments
+
+This is what the reddit comments look like. 
+--
+
+```{r tidy=FALSE}
+
+glimpse(lsf_data_comments,width = 50)
+
+
+```
+
+---
+
+# Tools used for analyzing the data
+
+
+
+
+
+
+
+---
+class: inverse, center, middle
+
+# Results
+
+---
+
+# Descriptions
+
+### Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated 
+
+
+
+---
+
+1. Most posted Author
+  -
+```{r echo=FALSE, message=FALSE}
+
+library(ggrepel)
+lsf_data %>% top_n(10,wt=score) %>% filter(score < 60000) %>% ggplot(aes(x = date, y = score, label = title, color = as.factor(score)))+
+  geom_point(show.legend = F)+
+  geom_text_repel(size = 3, vjust ="inward", hjust ='inward',show.legend = F, nudge_y = 10)+
+  theme_classic()+
+  labs(title  = "Top 10 posts by date")
 
 ```
 
 
+---
+
+1. two here.
+  - 
+```{r echo=FALSE, message=FALSE}
+
+lsf_data %>% group_by(author) %>% count(sort =T) %>% ungroup() %>% top_n(10) %>% ggplot(aes(x = author, y =n)) + geom_col()+
+  coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Number of Posts by Author",subtitle = "Top 10 Authors")
+
+
+```
+
+
+
+---
+
+1. three hehre.
+
+  - 
+  
+```{r echo=FALSE, message=FALSE}
+
+lsf_data %>% group_by(author) %>% summarize(sum(score)) %>%top_n(10) %>% ggplot(aes(x = author, y =`sum(score)`))+
+  geom_col()+
+  coord_flip()+
+  labs(y ="Total Score",x = "User",title = "Top scored author",subtitle = "Top 10 authors")
+
+```
+
+  
+  
+---
+
+1. four here.
+  - 
+  
+```{r echo=FALSE, message=FALSE}
+lsf_data %>% group_by(url) %>% count(sort = T)%>% filter(n > 2) %>% ggplot(aes(x = url, y =n)) + geom_col()+ coord_flip()+labs(x = "Link",y ="Number of Posts/Reposts",title ="Number of URL Reposts",subtitle = "Top 10 Links")
+
+```
+  
+
+---
+
+1. five here.
+  - 
+```{r echo=FALSE, message=FALSE}
+
+lsf_data %>% mutate(month =  as.factor(format(date, "%m"))) %>% group_by(month) %>% summarize(sum(score)) %>% arrange(month)%>%ungroup()%>% ggplot(aes(x=month, y = `sum(score)`, group = 1))+geom_line()+
+  labs(x = "Month" , y = "Sum of Posts" , title = "Sum of Karma by month", subtitle = "What happens in August? Classes Begin?")
+
+```
+
+
+---
+
+1. Six here.
+  - 
+```{r echo=FALSE, message=FALSE}
+
+lsf_data %>% mutate(year =  as.factor(format(date, "%Y"))) %>% group_by(year) %>% summarize(sum(score)) %>% arrange(year)%>%ungroup()%>% ggplot(aes(x=year, y = `sum(score)`, group = 1))+geom_line()+labs(x = "Year", y ="Sum Score" , title ="Sum of Karma by Year",subtitle = "looks like we have increasing interest in LSF over the years")
+
+```
+
+---
+
+# Results
+
+### Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated
+
+1. one here.
+  - 
+
 --
 
+1. two here.
+  - 
+
+--
+
+1. three hehre.
+  - 
+
+--
+
+1. four here.
+  - 
+
+--
+
+1. five here.
+  - 
+
+---
+
+# Limitations / Next Steps
+
+1. What are the limitations?
+
+
+1. What next step might you take if you continued pursuing this project?
+
+
+---
+
+# Conclusion
+
+1. Brief concluding statement
+
+1. What weere the big picture taeaaways from your project
+
+1. What have you leearned?
+
+
+
+---
+
+# References
+
+
+---
 You are recommended to use the [RStudio IDE](https://www.rstudio.com/products/rstudio/), but you do not have to.
 
 - Create a new R Markdown document from the menu `File -> New File -> R Markdown -> From Template -> Ninja Presentation`;<sup>1</sup>
@@ -253,8 +438,8 @@ leaflet() %>% addTiles() %>% setView(-93.65, 42.0285, zoom = 17)
 
 ```{r eval=require('DT'), tidy=FALSE}
 DT::datatable(
-  head(iris, 10),
-  fillContainer = FALSE, options = list(pageLength = 8)
+  head(lsf_data, 5),
+  fillContainer = T, options = list(pageLength = 8)
 )
 ```
 
