@@ -19,7 +19,7 @@ background-image: url(https://pbs.twimg.com/profile_images/1282742405616357378/i
 options(htmltools.dir.version = FALSE)
 
 library(pacman)
-p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork,igraph,ggraph,DT)
+p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork,igraph,ggraph,DT,ggthemes,extrafont)
 
 
 
@@ -32,6 +32,20 @@ lsf_data_comments$date<-as.POSIXct(lsf_data_comments$date,origin = "1970-01-01")
 
 ```
 
+
+```{r,message=FALSE,warning=FALSE, include=FALSE}
+
+lsf_data$titlev1 <- removeWords(lsf_data$title, stopwords("SMART"))
+lsf_data$titlev2 <- gsub("[[:punct:]]","",lsf_data$titlev1)
+lsf_data$titlev3 <- stripWhitespace(lsf_data$titlev2)
+post_tokens <-lsf_data %>% select(titlev3) %>% unnest_tokens(word,"titlev3")
+
+
+
+```
+
+
+
 Image credit: [LSF Twitter](https://twitter.com/rlivestreamfail)
 
 ---
@@ -39,6 +53,11 @@ Image credit: [LSF Twitter](https://twitter.com/rlivestreamfail)
 class: inverse, center, middle
 
 # Getting Started
+
+Recently, twitch literature has begun characterizing twitch communities through twitch chat, viewership trends, and content but no known projects have used resources that exist outside of twitch to understand how twitch communities manifest and interact with one another. Studies that exist have predominantly used most viewed broadcasters with large communities to begin understanding twitch user behavior. It’s known that the size of communities on twitch plays a large role in how users behave in the chatroom. One way we can get insight into these differences between small and large communities is by analyzing posts that feature “twitch clips”. Twitch clips are user-generated “replays” of a broadcast that are commonly shared on Youtube and Reddit. One subreddit called LivestreamFails (LSF) is a dedicated subreddit where users share these twitch clips. LSF is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. Furthermore, this will be a companion analysis to another project I have developed using twitch emote sentiment to understand twitch communities. This analysis will investigate users, posts, and comments (sentiment and topic) on LSF while providing me with an intentional way of selecting clips to use in my companion study. I also aim to understand how smaller streamers can become “noticed” on LSF and how to detect rising streamers via the subreddit. 
+
+---
+class: center, middle
 
 ## Data collection
 ---
@@ -116,8 +135,8 @@ library(ggrepel)
 lsf_data %>% top_n(10,wt=score) %>% filter(score < 60000) %>% ggplot(aes(x = date, y = score, label = title, color = as.factor(score)))+
   geom_point(show.legend = F)+
   geom_text_repel(size = 3, vjust ="inward", hjust ='inward',show.legend = F, nudge_y = 10)+
-  theme_classic()+
-  labs(title  = "Top 10 posts by date")
+  theme_wsj(base_size = 10,color = "green",base_family = "Segoe Print")+
+  labs(title  = "Top 10 posts by date") 
 
 ```
 
@@ -129,7 +148,8 @@ lsf_data %>% top_n(10,wt=score) %>% filter(score < 60000) %>% ggplot(aes(x = dat
 ```{r echo=FALSE, message=FALSE}
 
 lsf_data %>% group_by(author) %>% count(sort =T) %>% ungroup() %>% top_n(10) %>% ggplot(aes(x = author, y =n)) + geom_col()+
-  coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Number of Posts by Author",subtitle = "Top 10 Authors")
+coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Number of Posts by Author",subtitle = "Top 10 Authors") %>% theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
+
 
 
 ```
