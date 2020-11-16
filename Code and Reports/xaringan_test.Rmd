@@ -19,13 +19,20 @@ background-image: url(https://pbs.twimg.com/profile_images/1282742405616357378/i
 options(htmltools.dir.version = FALSE)
 
 library(pacman)
-p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork,igraph,ggraph,DT,ggthemes,extrafont)
+p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork,igraph,ggraph,DT,ggthemes,extrafont,xaringan)
+
+#lsf_data = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data.csv")
+
+# I think these files were ignored, need to set it up so that i will read in from git or somewhere!
 
 
+lsf_data = read_csv("C:/Users/mowgli/Documents/Github/MSIA-21-/Network Analysis/lsf_data.csv")
 
-lsf_data = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data.csv")
+
+#lsf_data_comments = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data_comments.csv")
 
 lsf_data_comments = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data_comments.csv")
+
 
 lsf_data_comments$date<-as.POSIXct(lsf_data_comments$date,origin = "1970-01-01")
 
