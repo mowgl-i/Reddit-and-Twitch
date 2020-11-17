@@ -21,12 +21,12 @@ options(htmltools.dir.version = FALSE)
 library(pacman)
 p_load(tidyverse,tidytext,tm,lubridate,stringr, text2vec,jsonlite,widyr,quanteda,visNetwork,igraph,ggraph,DT,ggthemes,extrafont,xaringan)
 
-#lsf_data = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data.csv")
+lsf_data = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data.csv")
 
 # I think these files were ignored, need to set it up so that i will read in from git or somewhere!
 
 
-lsf_data = read_csv("C:/Users/mowgli/Documents/Github/MSIA-21-/Network Analysis/lsf_data.csv")
+#lsf_data = read_csv("C:/Users/mowgli/Documents/Github/MSIA-21-/Network Analysis/lsf_data.csv")
 
 
 #lsf_data_comments = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data_comments.csv")
@@ -136,27 +136,30 @@ class: inverse, center, middle
 
 1. Most posted Author
   -
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE,warning=FALSE}
 
 library(ggrepel)
 lsf_data %>% top_n(10,wt=score) %>% filter(score < 60000) %>% ggplot(aes(x = date, y = score, label = title, color = as.factor(score)))+
   geom_point(show.legend = F)+
   geom_text_repel(size = 3, vjust ="inward", hjust ='inward',show.legend = F, nudge_y = 10)+
   theme_wsj(base_size = 10,color = "green",base_family = "Segoe Print")+
-  labs(title  = "Top 10 posts by date") 
+  labs(title  = "Top 10 upvoted posts by date",caption = "Twitch, youtube, games and memes")+ theme(plot.caption = element_text(size = 10)) 
 
 ```
+
+???
+
+This visualization helps me understand which types of media are featured on the subreddit. This is great becaues we can see that alot of these posts are *Twitch* related other than the etika post, who is a famous and beloved youtuber. Also, the keanu reeves moment during his presentation at a gaming convention. 
 
 
 ---
 
 1. two here.
   - 
-```{r echo=FALSE, message=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-lsf_data %>% group_by(author) %>% count(sort =T) %>% ungroup() %>% top_n(10) %>% ggplot(aes(x = author, y =n)) + geom_col()+
-coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Number of Posts by Author",subtitle = "Top 10 Authors") %>% theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
-
+lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% count(sort =T) %>% ungroup() %>% top_n(10) %>% ggplot(aes(x = author, y =n)) + geom_col()+
+coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Which users post the most?",subtitle = "Top 10 users")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
 
 
 ```
@@ -171,10 +174,11 @@ coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Number of Posts by A
   
 ```{r echo=FALSE, message=FALSE}
 
-lsf_data %>% group_by(author) %>% summarize(sum(score)) %>%top_n(10) %>% ggplot(aes(x = author, y =`sum(score)`))+
+lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% summarize(sum(score)) %>%top_n(10) %>% ggplot(aes(x = author, y =`sum(score)`))+
   geom_col()+
   coord_flip()+
-  labs(y ="Total Score",x = "User",title = "Top scored author",subtitle = "Top 10 authors")
+  labs(y ="Total Score",x = "User",title = "Top upvoted redditors",subtitle = "Top 10 users")+
+  theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
 
 ```
 
@@ -186,7 +190,9 @@ lsf_data %>% group_by(author) %>% summarize(sum(score)) %>%top_n(10) %>% ggplot(
   - 
   
 ```{r echo=FALSE, message=FALSE}
-lsf_data %>% group_by(url) %>% count(sort = T)%>% filter(n > 2) %>% ggplot(aes(x = url, y =n)) + geom_col()+ coord_flip()+labs(x = "Link",y ="Number of Posts/Reposts",title ="Number of URL Reposts",subtitle = "Top 10 Links")
+lsf_data %>% group_by(url) %>% count(sort = T)%>% filter(n > 2) %>% ggplot(aes(x = url, y =n)) + geom_col()+labs(x = "Link",y ="Number of Posts/Reposts",title ="Number of URL Reposts",subtitle = "Top 10 Links")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+theme(axis.text.x = element_text(angle = 30,vjust = 0.9,size = 5))
+
+# This needs to be fixed
 
 ```
   
@@ -198,9 +204,19 @@ lsf_data %>% group_by(url) %>% count(sort = T)%>% filter(n > 2) %>% ggplot(aes(x
 ```{r echo=FALSE, message=FALSE}
 
 lsf_data %>% mutate(month =  as.factor(format(date, "%m"))) %>% group_by(month) %>% summarize(sum(score)) %>% arrange(month)%>%ungroup()%>% ggplot(aes(x=month, y = `sum(score)`, group = 1))+geom_line()+
-  labs(x = "Month" , y = "Sum of Posts" , title = "Sum of Karma by month", subtitle = "What happens in August? Classes Begin?")
+  labs(x = "Month" , y = "Sum of Posts" , title = "Sum of Karma/Points by month")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
 
 ```
+
+
+???
+
+What is causing the massive dip in october? Is this a trend that is seen throughout the years? Let's take through all the years. 
+- Facet by each year, or plot each year by eachother. What does this tell  me about the community?
+Is the data skewed since I don't have complete years of data? 
+
+
+
 
 
 ---
@@ -209,9 +225,14 @@ lsf_data %>% mutate(month =  as.factor(format(date, "%m"))) %>% group_by(month) 
   - 
 ```{r echo=FALSE, message=FALSE}
 
-lsf_data %>% mutate(year =  as.factor(format(date, "%Y"))) %>% group_by(year) %>% summarize(sum(score)) %>% arrange(year)%>%ungroup()%>% ggplot(aes(x=year, y = `sum(score)`, group = 1))+geom_line()+labs(x = "Year", y ="Sum Score" , title ="Sum of Karma by Year",subtitle = "looks like we have increasing interest in LSF over the years")
+lsf_data %>% mutate(year =  as.factor(format(date, "%Y"))) %>% group_by(year) %>% summarize(sum(score)) %>% arrange(year)%>%ungroup()%>% ggplot(aes(x=year, y = `sum(score)`, group = 1))+geom_line()+labs(x = "Year", y ="Sum Score" , title ="Sum of Karma by Year",subtitle = "looks like we have increasing interest in LSF over the years") + theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green") + theme(plot.subtitle = element_text(size = 10))
 
 ```
+
+???
+
+LSF is becoming increasingly popular, amassing over - insert number of "points" here and number of user here - that come here for twitch related content. This is undoubletedly a useful resource when it comes to understanding various aspects of twitch. 
+
 
 ---
 
