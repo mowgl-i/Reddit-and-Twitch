@@ -109,8 +109,11 @@ test<-top_10 %>%
 streamers = c("trainwreckstv","esfandtv","forsen","mizkif","ludwig","moonmoon","xqcow","sykkuno","vadikus007","loltyler1")
 
 test_viz <- toVisNetworkData(test)
+test_viz
 
-test_viz$nodes <- test_viz$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"))
+
+test_viz$nodes <- test_viz$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"),
+                                            "emote_link" = )
 #test_viz checking the dataframe
 visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
   visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
@@ -142,4 +145,86 @@ What I need to do, I'd like to show, all the popular emotes that are shared amon
 - Will i need to do this manually?
 - Frankerfacez seems like it can be scraped. 
 - BTTV written in js. 
+
+```{r}
+
+# testing images
+p_load(magick)
+
+emote <- image_read("https://cdn.frankerfacez.com/emoticon/318914/1")
+
+# This looks like it works, just need to correct it. to work with entire dataframe. 
+
+
+image_write(emote, path = "C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/Emote Photos/test_emote.png", format = "png")
+
+
+
+plot(as.raster(emote))
+
+emote
+print(emote)
+
+test_emote_read<-test_viz$edges[1:10,]
+
+test_emote_read_1<-test_emote_read %>% mutate('image' = as.raster(image_read(emote_link)))
+
+
+test_emote_read_1
+
+
+# I THINK I"M GOING TO HAVE TO DOWN LOAD THE PHOTOS
+
+```
+
+Testing with ffz emotes, by inner join
+
+```{r}
+
+test<-top_10 %>%
+  mutate(contains_emote = case_when(item1 %in% emote_data$emote_name ~ 1, TRUE ~ 0)) %>% 
+  filter(contains_emote == 1) %>% # filtering for only emotes!
+  filter(streamer != "WHO?")%>%
+  inner_join(emote_data, by = c("item1" = "emote_name")) %>% 
+  filter(emote_link != is.na(emote_link)) %>% 
+  group_by(streamer) %>% top_n(10,wt = correlation) %>%
+  graph_from_data_frame()# %>%
+ # ggraph(layout = "fr") +
+ # geom_edge_link(aes(edge_alpha = correlation), show.legend = FALSE) +
+ #  geom_node_point(aes(color = streamer), size = 5) +
+ #  geom_node_text(aes(label = name), repel = TRUE) +
+ #  theme_void()
+
+streamers = c("trainwreckstv","esfandtv","forsen","mizkif","ludwig","moonmoon","xqcow","sykkuno","vadikus007","loltyler1")
+
+test_viz <- toVisNetworkData(test)
+
+test_viz$edges
+test_viz$nodes
+test_viz$nodes <- test_viz$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"),
+                                            "shape" = "image") %>% 
+  inner_join(test_viz$edges, by = c("id" = "from")) %>%
+  select(c(id,label,group,shape,emote_link))%>%
+  mutate("image" = magick::image_read(emote_link))
+
+
+
+#test_viz checking the dataframe
+visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
+  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
+  visGroups(groupname = "Emote", color = "blue")%>%
+  visOptions(highlightNearest = list(enabled = T, hover = T))%>%
+  visLegend()
+
+```
+
+```{r}
+
+p_load(imager)
+
+load.image("https://cdn.frankerfacez.com/emoticon/318914/1")
+
+imager::
+
+```
 
