@@ -28,10 +28,10 @@
 class: center, middle, inverse, title-slide
 
 # Subreddit Analysis
-## a closer look at r/livestreamfail 🧐
+## A closer look at r/livestreamfail 🧐
 ### mowgli
 ### UNC Greensboro
-### 2020/11/10 (updated: 2020-11-16)
+### 2020/11/10 (updated: 2020-11-18)
 
 ---
 
@@ -53,7 +53,16 @@ class: inverse, center, middle
 
 # Getting Started
 
-Recently, twitch literature has begun characterizing twitch communities through twitch chat, viewership trends, and content but no known projects have used resources that exist outside of twitch to understand how twitch communities manifest and interact with one another. Studies that exist have predominantly used most viewed broadcasters with large communities to begin understanding twitch user behavior. It’s known that the size of communities on twitch plays a large role in how users behave in the chatroom. One way we can get insight into these differences between small and large communities is by analyzing posts that feature “twitch clips”. Twitch clips are user-generated “replays” of a broadcast that are commonly shared on Youtube and Reddit. One subreddit called LivestreamFails (LSF) is a dedicated subreddit where users share these twitch clips. LSF is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. Furthermore, this will be a companion analysis to another project I have developed using twitch emote sentiment to understand twitch communities. This analysis will investigate users, posts, and comments (sentiment and topic) on LSF while providing me with an intentional way of selecting clips to use in my companion study. I also aim to understand how smaller streamers can become “noticed” on LSF and how to detect rising streamers via the subreddit. 
+Recently, twitch literature has begun characterizing twitch communities through twitch chat, viewership trends, and content but no known projects have used resources that exist outside of twitch to understand how twitch communities manifest and interact with one another. 
+
+One subreddit called LivestreamFails (LSF) is a dedicated subreddit where users share these twitch clips. LSF is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. Furthermore, this will be a companion analysis to another project I have developed using twitch emote sentiment to understand twitch communities.
+
+
+This analysis will investigate users, posts, and comments (sentiment and topic) on LSF while providing me with an intentional way of selecting clips to use in my companion study.
+
+???
+
+Studies that exist have predominantly used most viewed broadcasters with large communities to begin understanding twitch user behavior. It’s known that the size of communities on twitch plays a large role in how users behave in the chatroom. One way we can get insight into these differences between small and large communities is by analyzing posts that feature “twitch clips”. Twitch clips are user-generated “replays” of a broadcast that are commonly shared on Youtube and Reddit. One subreddit called LivestreamFails (LSF) is a dedicated subreddit where users share these twitch clips. LSF is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. Furthermore, this will be a companion analysis to another project I have developed using twitch emote sentiment to understand twitch communities. This analysis will investigate users, posts, and comments (sentiment and topic) on LSF while providing me with an intentional way of selecting clips to use in my companion study. I also aim to understand how smaller streamers can become “noticed” on LSF and how to detect rising streamers via the subreddit. 
 
 ---
 class: center, middle
@@ -131,114 +140,203 @@ glimpse(lsf_data_comments,width = 50)
 # Tools used for analyzing the data
 
 
+.pull_left[
+- tidyverse
+- tidytext
+- tm
+- lubridate
+- stringr 
+- text2vec
+- jsonlite
+- widyr
+]
 
-
-
-
-
----
-class: inverse, center, middle
-
-# Results
+.pull_right[
+- quanteda
+- visNetwork
+- igraph
+- ggraph
+- DT
+- ggthemes
+- extrafont
+- xaringan
+]
 
 ---
 
 # Descriptions
 
-### Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated 
+
+Here my aim is to support why this kind of data I have is useful for understanding twitch communities using simple visualizations. 
 
 
-
+???
+Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated 
 ---
 
-1. Most posted Author
-  -
+class: center,middle
+
 ![](xaringan_test_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
 
 ???
+
+This is a plot of "Karma" which can be thought of as likes over 3 years on the subreddit. 
+As we can see, there is a growing interest in this subreddit since it's recieved more than 4 times the upvotes last year since the 2016.  
+
+My next intereste was too see if there was a karma pattern at the monthly level. 
+
+---
+class: center,middle
+
+![](xaringan_test_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+
+???
+
+Yes there is a pattern at the monthly level! there are 2 clear peaks and dips. This information may be useful for streamers or community members to 'farm' clips or strategicly post on the reddit to maximize the oprotunity of karma or views.  
+
+---
+
+class: center,middle
+
+![](xaringan_test_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+???
+
+Shift gears, let's explore another area of the data, which are posts. There are more than 38,000 posts in the dataset, so let's just look at the top 10 posts over time. 
+
+
 
 This visualization helps me understand which types of media are featured on the subreddit. This is great becaues we can see that alot of these posts are *Twitch* related other than the etika post, who is a famous and beloved youtuber. Also, the keanu reeves moment during his presentation at a gaming convention. 
 
 
 ---
+class: center,middle
 
-1. two here.
-  - 
-![](xaringan_test_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
-
-
-
----
-
-1. three hehre.
-
-  - 
-  
-![](xaringan_test_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
-
-  
-  
----
-
-1. four here.
-  - 
-  
 ![](xaringan_test_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
-  
+
+???
+
+I just showed you the top 10 posts of all time on lsf, now here are the top 10 'poster' on lsf. 
+
+Normiesree has a suspisous amount of posts! Could they be reposts? Are they legit posts? perhaps he's the oldest surviving member of "top posters" on lsf, since many users were [deleted]. 
+
+- I'm going to investigate this further at a later time. 
+
 
 ---
 
-1. five here.
-  - 
+class: center,middle
+
+  
 ![](xaringan_test_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
 
-
 ???
 
-What is causing the massive dip in october? Is this a trend that is seen throughout the years? Let's take through all the years. 
-- Facet by each year, or plot each year by eachother. What does this tell  me about the community?
-Is the data skewed since I don't have complete years of data? 
+Who are the most upvoted users? Normiesree again! 
+If normiesree's posts are legitament, this person has a lot of influence on the narritive of lsf?
 
 
-
-
-
+  
 ---
+class: center,middle
 
-1. Six here.
-  - 
+  
 ![](xaringan_test_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+  
 
 ???
 
-LSF is becoming increasingly popular, amassing over - insert number of "points" here and number of user here - that come here for twitch related content. This is undoubletedly a useful resource when it comes to understanding various aspects of twitch. 
+This here will show the number of duplicate links that happen on LSF. 
+
+LSF is pretty good at removing duplicate / very similar posts, so those seen here shouldn't be repost. Rather, these are new posts that happen throughout time. I expected that the numbers would be much larger. For example this shows that streamers Mitch jones and Erobb221 are frequently featured on LSF, denoted by the twitch link. 
 
 
 ---
+
+
+```r
+library(lubridate)
+lsf_data %&gt;% group_by(domain, year(date)) %&gt;% count() %&gt;% filter(n&gt;50)  %&gt;% ggplot(aes(x = `year(date)`, y = n , color = domain ))+
+  geom_line()+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+ theme(legend.title = element_blank(),plot.subtitle = element_text(size = 10))+ labs(title = "Post Links over time.", subtitle = "Filtered for links occuring more than 50 times")
+```
+
+![](xaringan_test_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+
+
+
+
+---
+
+```r
+lsf_data$lsf_post_tokens &lt;- lsf_data$title %&gt;% 
+  removePunctuation() %&gt;%
+  removeNumbers() %&gt;%
+  tolower() %&gt;%
+  stemDocument() %&gt;%
+  stripWhitespace()
+
+lsf_data %&gt;% mutate(domain = as.factor(domain))
+
+lsf_post_tokens &lt;- lsf_data %&gt;% 
+  unnest_tokens(word,lsf_post_tokens) %&gt;% 
+  anti_join(stop_words) %&gt;% filter(domain %in% c("clips.twitch.tv","oddshot.tv","streamable.com","twitter.com","youtu.be",
+                                                "neatclip.com","self.LifeStreamFail", "twitch.tv","v.redd.it","youtube.com")) %&gt;% 
+  mutate(domain = as.factor(domain))
+
+
+word_cors &lt;- lsf_post_tokens %&gt;%
+  group_by(word) %&gt;%
+  filter(n() &gt;= 10 ) %&gt;%
+  ungroup()%&gt;%
+  pairwise_cor(word, domain, sort = T)
+
+word_cors %&gt;% filter(item2 == "clips.twitch.tv")
+head(word_cors,n = 20)
+
+network_domain &lt;-word_cors %&gt;%
+  group_by(domain) %&gt;% top_n(10,wt = correlation) %&gt;%
+  graph_from_data_frame()
+
+domain_viz &lt;- toVisNetworkData(network_domain)
+
+domain_viz$nodes &lt;- domain_viz$nodes %&gt;% mutate("group" = case_when(label %in% streamers ~ "domain",TRUE ~ "Emote"))
+#test_viz checking the dataframe
+visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%&gt;%
+  visGroups(groupname = "Streamer", color = "green", shape = "square") %&gt;%
+  visGroups(groupname = "Emote", color = "blue")%&gt;%
+  visOptions(highlightNearest = list(enabled = T, hover = T))%&gt;%
+  visLegend()
+```
+
 
 # Results
 
 ### Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated
 
+
+--- 
+
 1. one here.
   - 
 
---
+---
 
 1. two here.
   - 
 
---
+---
 
 1. three hehre.
   - 
 
---
+---
 
 1. four here.
   - 
 
---
+---
 
 1. five here.
   - 
@@ -537,8 +635,8 @@ library(leaflet)
 leaflet() %&gt;% addTiles() %&gt;% setView(-93.65, 42.0285, zoom = 17)
 ```
 
-<div id="htmlwidget-40a7556d68bc77c5f16a" style="width:100%;height:432px;" class="leaflet html-widget"></div>
-<script type="application/json" data-for="htmlwidget-40a7556d68bc77c5f16a">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ca59c5384c6439a5d78a" style="width:100%;height:432px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ca59c5384c6439a5d78a">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["//{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]}],"setView":[[42.0285,-93.65],17,[]]},"evals":[],"jsHooks":[]}</script>
 
 ---
 
@@ -550,8 +648,8 @@ DT::datatable(
 )
 ```
 
-<div id="htmlwidget-ecf6772caa2594188465" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-ecf6772caa2594188465">{"x":{"filter":"none","fillContainer":true,"data":[["1","2","3","4","5"],["PoE streamer gets scared by his own notification.","OfficialDuckStudios gives pizza delivery driver $25 tip on friends card","Armor from the cosplay contest winner falls off.","Awesome Song Timing - Bikeman Battlefield 1","Path of Exile streamer falls for the good old John Cena"],[49,62,74,402,43],["https://clips.twitch.tv/zizaran/AverageBeaverPMSTwin","https://oddshot.tv/shot/OfficialDuckStudios/Uzo7_Yzk7_ZCH7ZvCjchbzj8","https://clips.twitch.tv/twitch/PowerfulPeafowlSoBayed","https://clips.twitch.tv/bikeman/NiceChickenHeyGuys","https://clips.twitch.tv/pcchild/BetterHerdFunRun"],["2016-10-23","2016-10-01","2016-10-01","2016-10-24","2016-10-08"],["clips.twitch.tv","oddshot.tv","clips.twitch.tv","clips.twitch.tv","clips.twitch.tv"],["spoonducky","Chandman68","MiT_Epona","Meatloaf451","spoonducky"],["/r/LivestreamFail/comments/58y5c3/poe_streamer_gets_scared_by_his_own_notification/","/r/LivestreamFail/comments/55bf4k/officialduckstudios_gives_pizza_delivery_driver/","/r/LivestreamFail/comments/55fv2q/armor_from_the_cosplay_contest_winner_falls_off/","/r/LivestreamFail/comments/5926jf/awesome_song_timing_bikeman_battlefield_1/","/r/LivestreamFail/comments/56hbq9/path_of_exile_streamer_falls_for_the_good_old/"],["PoE streamer  scared    notification.","OfficialDuckStudios  pizza delivery driver $25 tip  friends card","Armor   cosplay contest winner falls .","Awesome Song Timing - Bikeman Battlefield 1","Path  Exile streamer falls   good  John Cena"],["PoE streamer  scared    notification","OfficialDuckStudios  pizza delivery driver 25 tip  friends card","Armor   cosplay contest winner falls ","Awesome Song Timing  Bikeman Battlefield 1","Path  Exile streamer falls   good  John Cena"],["PoE streamer scared notification","OfficialDuckStudios pizza delivery driver 25 tip friends card","Armor cosplay contest winner falls ","Awesome Song Timing Bikeman Battlefield 1","Path Exile streamer falls good John Cena"]],"container":"<table class=\"display fill-container\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>title<\/th>\n      <th>score<\/th>\n      <th>url<\/th>\n      <th>date<\/th>\n      <th>domain<\/th>\n      <th>author<\/th>\n      <th>permalink<\/th>\n      <th>titlev1<\/th>\n      <th>titlev2<\/th>\n      <th>titlev3<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-2eaa0315804edf50e9fb" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2eaa0315804edf50e9fb">{"x":{"filter":"none","fillContainer":true,"data":[["1","2","3","4","5"],["PoE streamer gets scared by his own notification.","OfficialDuckStudios gives pizza delivery driver $25 tip on friends card","Armor from the cosplay contest winner falls off.","Awesome Song Timing - Bikeman Battlefield 1","Path of Exile streamer falls for the good old John Cena"],[49,62,74,402,43],["https://clips.twitch.tv/zizaran/AverageBeaverPMSTwin","https://oddshot.tv/shot/OfficialDuckStudios/Uzo7_Yzk7_ZCH7ZvCjchbzj8","https://clips.twitch.tv/twitch/PowerfulPeafowlSoBayed","https://clips.twitch.tv/bikeman/NiceChickenHeyGuys","https://clips.twitch.tv/pcchild/BetterHerdFunRun"],["2016-10-23","2016-10-01","2016-10-01","2016-10-24","2016-10-08"],["clips.twitch.tv","oddshot.tv","clips.twitch.tv","clips.twitch.tv","clips.twitch.tv"],["spoonducky","Chandman68","MiT_Epona","Meatloaf451","spoonducky"],["/r/LivestreamFail/comments/58y5c3/poe_streamer_gets_scared_by_his_own_notification/","/r/LivestreamFail/comments/55bf4k/officialduckstudios_gives_pizza_delivery_driver/","/r/LivestreamFail/comments/55fv2q/armor_from_the_cosplay_contest_winner_falls_off/","/r/LivestreamFail/comments/5926jf/awesome_song_timing_bikeman_battlefield_1/","/r/LivestreamFail/comments/56hbq9/path_of_exile_streamer_falls_for_the_good_old/"],["PoE streamer  scared    notification.","OfficialDuckStudios  pizza delivery driver $25 tip  friends card","Armor   cosplay contest winner falls .","Awesome Song Timing - Bikeman Battlefield 1","Path  Exile streamer falls   good  John Cena"],["PoE streamer  scared    notification","OfficialDuckStudios  pizza delivery driver 25 tip  friends card","Armor   cosplay contest winner falls ","Awesome Song Timing  Bikeman Battlefield 1","Path  Exile streamer falls   good  John Cena"],["PoE streamer scared notification","OfficialDuckStudios pizza delivery driver 25 tip friends card","Armor cosplay contest winner falls ","Awesome Song Timing Bikeman Battlefield 1","Path Exile streamer falls good John Cena"]],"container":"<table class=\"display fill-container\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>title<\/th>\n      <th>score<\/th>\n      <th>url<\/th>\n      <th>date<\/th>\n      <th>domain<\/th>\n      <th>author<\/th>\n      <th>permalink<\/th>\n      <th>titlev1<\/th>\n      <th>titlev2<\/th>\n      <th>titlev3<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":8,"columnDefs":[{"className":"dt-right","targets":2},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[8,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 
 ---
 

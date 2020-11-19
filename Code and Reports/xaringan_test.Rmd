@@ -1,6 +1,6 @@
 ---
 title: "Subreddit Analysis"
-subtitle: "a closer look at r/livestreamfail 🧐"
+subtitle: "A closer look at r/livestreamfail 🧐"
 author: "mowgli"
 institute: "UNC Greensboro"
 date: "2020/11/10 (updated: `r Sys.Date()`)"
@@ -61,7 +61,16 @@ class: inverse, center, middle
 
 # Getting Started
 
-Recently, twitch literature has begun characterizing twitch communities through twitch chat, viewership trends, and content but no known projects have used resources that exist outside of twitch to understand how twitch communities manifest and interact with one another. Studies that exist have predominantly used most viewed broadcasters with large communities to begin understanding twitch user behavior. It’s known that the size of communities on twitch plays a large role in how users behave in the chatroom. One way we can get insight into these differences between small and large communities is by analyzing posts that feature “twitch clips”. Twitch clips are user-generated “replays” of a broadcast that are commonly shared on Youtube and Reddit. One subreddit called LivestreamFails (LSF) is a dedicated subreddit where users share these twitch clips. LSF is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. Furthermore, this will be a companion analysis to another project I have developed using twitch emote sentiment to understand twitch communities. This analysis will investigate users, posts, and comments (sentiment and topic) on LSF while providing me with an intentional way of selecting clips to use in my companion study. I also aim to understand how smaller streamers can become “noticed” on LSF and how to detect rising streamers via the subreddit. 
+Recently, twitch literature has begun characterizing twitch communities through twitch chat, viewership trends, and content but no known projects have used resources that exist outside of twitch to understand how twitch communities manifest and interact with one another. 
+
+One subreddit called LivestreamFails (LSF) is a dedicated subreddit where users share these twitch clips. LSF is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. Furthermore, this will be a companion analysis to another project I have developed using twitch emote sentiment to understand twitch communities.
+
+
+This analysis will investigate users, posts, and comments (sentiment and topic) on LSF while providing me with an intentional way of selecting clips to use in my companion study.
+
+???
+
+Studies that exist have predominantly used most viewed broadcasters with large communities to begin understanding twitch user behavior. It’s known that the size of communities on twitch plays a large role in how users behave in the chatroom. One way we can get insight into these differences between small and large communities is by analyzing posts that feature “twitch clips”. Twitch clips are user-generated “replays” of a broadcast that are commonly shared on Youtube and Reddit. One subreddit called LivestreamFails (LSF) is a dedicated subreddit where users share these twitch clips. LSF is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. Furthermore, this will be a companion analysis to another project I have developed using twitch emote sentiment to understand twitch communities. This analysis will investigate users, posts, and comments (sentiment and topic) on LSF while providing me with an intentional way of selecting clips to use in my companion study. I also aim to understand how smaller streamers can become “noticed” on LSF and how to detect rising streamers via the subreddit. 
 
 ---
 class: center, middle
@@ -114,116 +123,43 @@ glimpse(lsf_data_comments,width = 50)
 # Tools used for analyzing the data
 
 
+.pull_left[
+- tidyverse
+- tidytext
+- tm
+- lubridate
+- stringr 
+- text2vec
+- jsonlite
+- widyr
+]
 
-
-
-
-
----
-class: inverse, center, middle
-
-# Results
+.pull_right[
+- quanteda
+- visNetwork
+- igraph
+- ggraph
+- DT
+- ggthemes
+- extrafont
+- xaringan
+]
 
 ---
 
 # Descriptions
 
-### Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated 
 
-
-
----
-
-1. Most posted Author
-  -
-```{r echo=FALSE, message=FALSE,warning=FALSE}
-
-library(ggrepel)
-lsf_data %>% top_n(10,wt=score) %>% filter(score < 60000) %>% ggplot(aes(x = date, y = score, label = title, color = as.factor(score)))+
-  geom_point(show.legend = F)+
-  geom_text_repel(size = 3, vjust ="inward", hjust ='inward',show.legend = F, nudge_y = 10)+
-  theme_wsj(base_size = 10,color = "green",base_family = "Segoe Print")+
-  labs(title  = "Top 10 upvoted posts by date",caption = "Twitch, youtube, games and memes")+ theme(plot.caption = element_text(size = 10)) 
-
-```
-
-???
-
-This visualization helps me understand which types of media are featured on the subreddit. This is great becaues we can see that alot of these posts are *Twitch* related other than the etika post, who is a famous and beloved youtuber. Also, the keanu reeves moment during his presentation at a gaming convention. 
-
-
----
-
-1. two here.
-  - 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-
-lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% count(sort =T) %>% ungroup() %>% top_n(10) %>% ggplot(aes(x = author, y =n)) + geom_col()+
-coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Which users post the most?",subtitle = "Top 10 users")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
-
-
-```
-
-
-
----
-
-1. three hehre.
-
-  - 
-  
-```{r echo=FALSE, message=FALSE}
-
-lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% summarize(sum(score)) %>%top_n(10) %>% ggplot(aes(x = author, y =`sum(score)`))+
-  geom_col()+
-  coord_flip()+
-  labs(y ="Total Score",x = "User",title = "Top upvoted redditors",subtitle = "Top 10 users")+
-  theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
-
-```
-
-  
-  
----
-
-1. four here.
-  - 
-  
-```{r echo=FALSE, message=FALSE}
-lsf_data %>% group_by(url) %>% count(sort = T)%>% filter(n > 2) %>% ggplot(aes(x = url, y =n)) + geom_col()+labs(x = "Link",y ="Number of Posts/Reposts",title ="Number of URL Reposts",subtitle = "Top 10 Links")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+theme(axis.text.x = element_text(angle = 30,vjust = 0.9,size = 5))
-
-# This needs to be fixed
-
-```
-  
-
----
-
-1. five here.
-  - 
-```{r echo=FALSE, message=FALSE}
-
-lsf_data %>% mutate(month =  as.factor(format(date, "%m"))) %>% group_by(month) %>% summarize(sum(score)) %>% arrange(month)%>%ungroup()%>% ggplot(aes(x=month, y = `sum(score)`, group = 1))+geom_line()+
-  labs(x = "Month" , y = "Sum of Posts" , title = "Sum of Karma/Points by month")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
-
-```
+Here my aim is to support why this kind of data I have is useful for understanding twitch communities using simple visualizations. 
 
 
 ???
-
-What is causing the massive dip in october? Is this a trend that is seen throughout the years? Let's take through all the years. 
-- Facet by each year, or plot each year by eachother. What does this tell  me about the community?
-Is the data skewed since I don't have complete years of data? 
-
-
-
-
-
+Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated 
 ---
 
-1. Six here.
-  - 
-```{r echo=FALSE, message=FALSE}
+class: center,middle
+
+```{r echo=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
 
 lsf_data %>% mutate(year =  as.factor(format(date, "%Y"))) %>% group_by(year) %>% summarize(sum(score)) %>% arrange(year)%>%ungroup()%>% ggplot(aes(x=year, y = `sum(score)`, group = 1))+geom_line()+labs(x = "Year", y ="Sum Score" , title ="Sum of Karma by Year",subtitle = "looks like we have increasing interest in LSF over the years") + theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green") + theme(plot.subtitle = element_text(size = 10))
 
@@ -231,34 +167,200 @@ lsf_data %>% mutate(year =  as.factor(format(date, "%Y"))) %>% group_by(year) %>
 
 ???
 
-LSF is becoming increasingly popular, amassing over - insert number of "points" here and number of user here - that come here for twitch related content. This is undoubletedly a useful resource when it comes to understanding various aspects of twitch. 
+This is a plot of "Karma" which can be thought of as likes over 3 years on the subreddit. 
+As we can see, there is a growing interest in this subreddit since it's recieved more than 4 times the upvotes last year since the 2016.  
+
+My next intereste was too see if there was a karma pattern at the monthly level. 
+
+---
+class: center,middle
+
+```{r echo=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
+
+lsf_data %>% mutate(month =  as.factor(format(date, "%m")),
+                    year = as.factor(year(date))) %>%
+  group_by(year,month) %>% summarize(sum(score)) %>% arrange(month)%>%ungroup()%>% ggplot(aes(x=month, y = `sum(score)`, group = 1))+geom_line()+
+  labs(x = "Month" , y = "Sum of Posts" , title = "Sum of Karma/Points by month")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+
+  facet_wrap(vars(year))
+
+```
+
+
+???
+
+Yes there is a pattern at the monthly level! there are 2 clear peaks and dips. This information may be useful for streamers or community members to 'farm' clips or strategicly post on the reddit to maximize the oprotunity of karma or views.  
+
+---
+
+class: center,middle
+
+```{r echo=FALSE, message=FALSE,warning=FALSE, fig.height= 8.5, fig.width=10}
+
+library(ggrepel)
+lsf_data %>% top_n(10,wt=score) %>% filter(score < 60000) %>% ggplot(aes(x = date, y = score, label = title, color = as.factor(score)))+
+  geom_point(show.legend = F)+
+  geom_label_repel(size = 3, vjust ="inward", hjust ='inward',show.legend = F, nudge_y = 10)+
+  theme_wsj(base_size = 10,color = "green",base_family = "Segoe Print")+
+  labs(title  = "Top 10 upvoted posts by date",caption = "Twitch, youtube, games and memes")+ theme(plot.caption = element_text(size = 10)) 
+
+```
+
+???
+
+Shift gears, let's explore another area of the data, which are posts. There are more than 38,000 posts in the dataset, so let's just look at the top 10 posts over time. 
+
+
+
+This visualization helps me understand which types of media are featured on the subreddit. This is great becaues we can see that alot of these posts are *Twitch* related other than the etika post, who is a famous and beloved youtuber. Also, the keanu reeves moment during his presentation at a gaming convention. 
 
 
 ---
+class: center,middle
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.height= 8.5, fig.width=10}
+
+lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% count(sort =T) %>% ungroup() %>% top_n(10) %>% ggplot(aes(x = reorder(author,n), y =n)) + geom_col()+
+coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Which users post the most?",subtitle = "Top 10 users")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
+
+
+```
+
+???
+
+I just showed you the top 10 posts of all time on lsf, now here are the top 10 'poster' on lsf. 
+
+Normiesree has a suspisous amount of posts! Could they be reposts? Are they legit posts? perhaps he's the oldest surviving member of "top posters" on lsf, since many users were [deleted]. 
+
+- I'm going to investigate this further at a later time. 
+
+
+---
+
+class: center,middle
+
+  
+```{r echo=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
+
+lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% summarize(sum(score)) %>%top_n(10) %>% ggplot(aes(x = reorder(author,`sum(score)`), y =`sum(score)`))+
+  geom_col()+
+  coord_flip()+
+  labs(y ="Total Score",x = "User",title = "Top upvoted redditors",subtitle = "Top 10 users")+
+  theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
+
+```
+
+???
+
+Who are the most upvoted users? Normiesree again! 
+If normiesree's posts are legitament, this person has a lot of influence on the narritive of lsf?
+
+
+  
+---
+class: center,middle
+
+  
+```{r echo=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
+lsf_data %>% group_by(url) %>% count(sort = T)%>% filter(n > 2) %>% ggplot(aes(x = url, y =n, fill = url)) + geom_col()+labs(x = "Link",y ="Number of Posts/Reposts",title ="Number of URL Reposts",subtitle = "Top 10 Links")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+theme(axis.text.x = element_blank(), legend.direction = "vertical", legend.title = element_blank(),axis.line.x = element_blank(),axis.ticks.x = element_blank()  ) + guides(fill = guide_legend(ncol = 3))
+
+# This needs to be fixed
+
+```
+  
+
+???
+
+This here will show the number of duplicate links that happen on LSF. 
+
+LSF is pretty good at removing duplicate / very similar posts, so those seen here shouldn't be repost. Rather, these are new posts that happen throughout time. I expected that the numbers would be much larger. For example this shows that streamers Mitch jones and Erobb221 are frequently featured on LSF, denoted by the twitch link. 
+
+
+---
+
+```{r}
+library(lubridate)
+lsf_data %>% group_by(domain, year(date)) %>% count() %>% filter(n>50)  %>% ggplot(aes(x = `year(date)`, y = n , color = domain ))+
+  geom_line()+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+ theme(legend.title = element_blank(),plot.subtitle = element_text(size = 10))+ labs(title = "Post Links over time.", subtitle = "Filtered for links occuring more than 50 times")
+
+
+```
+
+
+
+
+
+---
+```{r tokens and what not, eval=FALSE}
+
+lsf_data$lsf_post_tokens <- lsf_data$title %>% 
+  removePunctuation() %>%
+  removeNumbers() %>%
+  tolower() %>%
+  stemDocument() %>%
+  stripWhitespace()
+
+lsf_data %>% mutate(domain = as.factor(domain))
+
+lsf_post_tokens <- lsf_data %>% 
+  unnest_tokens(word,lsf_post_tokens) %>% 
+  anti_join(stop_words) %>% filter(domain %in% c("clips.twitch.tv","oddshot.tv","streamable.com","twitter.com","youtu.be",
+                                                "neatclip.com","self.LifeStreamFail", "twitch.tv","v.redd.it","youtube.com")) %>% 
+  mutate(domain = as.factor(domain))
+
+
+word_cors <- lsf_post_tokens %>%
+  group_by(word) %>%
+  filter(n() >= 10 ) %>%
+  ungroup()%>%
+  pairwise_cor(word, domain, sort = T)
+
+word_cors %>% filter(item2 == "clips.twitch.tv")
+head(word_cors,n = 20)
+
+network_domain <-word_cors %>%
+  group_by(domain) %>% top_n(10,wt = correlation) %>%
+  graph_from_data_frame()
+
+domain_viz <- toVisNetworkData(network_domain)
+
+domain_viz$nodes <- domain_viz$nodes %>% mutate("group" = case_when(label %in% streamers ~ "domain",TRUE ~ "Emote"))
+#test_viz checking the dataframe
+visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
+  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
+  visGroups(groupname = "Emote", color = "blue")%>%
+  visOptions(highlightNearest = list(enabled = T, hover = T))%>%
+  visLegend()
+
+
+```
+
 
 # Results
 
 ### Why these 5, how did they help me understand about the problem, how did it help me understand about the domain associated
 
+
+--- 
+
 1. one here.
   - 
 
---
+---
 
 1. two here.
   - 
 
---
+---
 
 1. three hehre.
   - 
 
---
+---
 
 1. four here.
   - 
 
---
+---
 
 1. five here.
   - 
