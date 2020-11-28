@@ -1,0 +1,168 @@
+---
+title: "Twitch Emote and Chat analysis"
+author: "Michael Puerto"
+date: "11/27/2020"
+output: 
+  html_document:
+    toc: true
+    code_folding: "hide"
+---
+
+# Add text here :)
+
+
+
+
+```{r libraries,message=FALSE,error=FALSE,warning=FALSE}
+library(pacman)
+
+p_load(tidyverse,
+       tidytext,
+       tm,
+       lubridate,
+       stringr, 
+       text2vec,
+       jsonlite,
+       widyr,
+       quanteda,
+       visNetwork,
+       igraph,
+       ggraph,
+       DT,
+       ggthemes)
+
+```
+
+
+```{r putting the clips together, include= FALSE,message=FALSE,error=FALSE,warning=FALSE}
+
+file_names = dir("C:/Users/macia/Documents/twitch_clips/October Clips")
+
+G_path = "C:/Users/macia/Documents/twitch_clips/October Clips/"
+data = NULL
+
+for(i in file_names){
+  L_path = paste(G_path,as.character(i),sep = "")
+  data_temp <- fromJSON(as.character(L_path))
+  
+  chat_temp <- data_temp$comments$message$body
+  user_temp <- data_temp$comments$commenter$display_name
+  date_temp <- data_temp$comments$commenter$created_at
+  streamer_temp <- data_temp$streamer$name
+  
+  #------------- This was me tyring to pull out the user bages ( Moderator/subcriber etc..)
+  # for(i in 1:length(data_temp$comments$message$user_badges)){
+  #  id_temp = list(data_temp$comments$message$user_badges[[i]]$`_id`)
+  #  id = c(test,id_temp)
+    
+    
+   # }
+  
+  data_temp = data.frame("body"= chat_temp,"user"=user_temp,"date"=date_temp,"streamer" = streamer_temp, stringsAsFactors = F)
+  #assign(paste(i,"data",sep = "_"),data_temp) # this will create new dataframes in the environment
+  data = bind_rows(data,data_temp)
+
+}
+
+rm(data_temp,chat_temp,data_temp,file_names,G_path,i,L_path,streamer_temp,user_temp,date_temp)
+
+
+data %>% glimpse(width = 50)
+
+```
+# Talk about the Data here. 
+
+- Body is the message of the chat
+- User is the ... I think I talked about this in another file. 
+
+```{r emote data from git lfs, include= FALSE,message=FALSE,error=FALSE,warning=FALSE}
+
+# gotta change these tokens :(, maybe have a git auth? This data is being read from github, and uses git lfs. 
+
+emote_data_bttv <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/bttv_emotes.csv?token=ALDJHKWDI54NLBT7UUU55E27YGTMG") 
+
+emote_data_ffz <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/ffz_emotes.csv?token=ALDJHKRP2VJN52LHK7F3UQS7YGTJU")
+
+emote_data <- emote_data_ffz %>% full_join(emote_data_bttv, by = "emote_name") %>% select(-c(X1.x,X1.y)) %>% distinct(emote_name,.keep_all = T)%>% 
+  mutate(emote_name = str_to_lower(emote_name))
+
+rm(emote_data_bttv,emote_data_ffz)
+
+```
+
+
+# Talk about this data table
+
+```{r emote datatable,message=FALSE,warning=FALSE}
+
+# https://i.stack.imgur.com/kLMaS.jpg
+
+test<-emote_data %>% mutate("emote_image" = paste("<img src=", emote_link, sep = "")) %>% 
+  mutate(emote_image = paste0(emote_image,' height="52"></img>',sep = "")) %>%  select(emote_name,emote_image)
+
+datatable(test, escape = FALSE)
+
+
+```
+
+# Tokens of the text
+
+
+only keeping all alphabetical characters, excludes numbers and punct. Still keeing stop words for now. 
+
+<br>
+
+Talk about the observations
+
+
+```{r, message=FALSE,warning=FALSE}
+tokens <- data %>%
+  unnest_tokens(word,body)%>% 
+  filter(str_detect(word,"^[:alpha:]"))
+
+tokens %>% glimpse(width = 50)
+
+```
+
+
+## Out of the 100 clips, which streamer has the most chats?
+
+```{r, fig.width=10}
+
+data %>% group_by(streamer) %>%  count(sort = T)%>%
+  head(n=10) %>% 
+  ggplot(aes(x = streamer, y = n))+
+  geom_col()+
+  theme_wsj(base_size = 12, color = "green")+
+  theme(axis.text.x = element_text(size = 12, angle = 15,vjust = .55))+
+  labs(title = "Which streamer has the most chats?")
+  
+
+```
+## Out of the 100 clips, which user has the most chats?
+
+```{r}
+
+data %>% group_by(user) %>%  count(sort = T)%>%
+  head(n=10)%>% 
+  ggplot(aes(x = user, y = n))+
+  geom_col()+
+  theme_wsj(base_size = 12, color = "green")+
+  theme(axis.text.x = element_text(size = 8, angle = 15,vjust = .55),
+        plot.title = element_text(size = 20))+
+  labs(title = "Which user has the most chats?")
+# Streamelements and streamlabs are bots. 
+
+
+```
+
+## Out of the 100 clips, which users can be seen in multiple high scoring clips
+
+REVISIT THIS ONE
+
+```{r}
+
+data %>% group_by(streamer,user) %>% count(sort = T) %>% head(n = 10)
+
+```
+
