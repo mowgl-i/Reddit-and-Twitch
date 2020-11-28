@@ -1,5 +1,5 @@
 ---
-title: "Twitch Emote and Chat analysis"
+title: "Final Report"
 author: "Michael Puerto"
 date: "11/27/2020"
 output: 
