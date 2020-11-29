@@ -8,10 +8,24 @@ output:
     code_folding: "hide"
 ---
 
-# Add text here :)
+# Maybe add a special logo here? Twitch x LSF thing idk
+
+# Getting Started
+
+Recently, twitch literature has begun characterizing twitch communities through twitch chat, viewership trends, and content but no known projects have used resources that exist outside of twitch to understand how twitch communities manifest and interact with one another. 
+
+One subreddit called LivestreamFail (LSF) is a dedicated subreddit where users share these twitch clips, general twitch news, and twitch drama.LivestreamFail is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. I'm interested in the ways emotes are used between smaller and larger communities because I believe emote meanings and sentiments are being actively redefined. This analysis will be split into an LSF part and Twitch emote-sentiment part.  
+
+This analysis will investigate users, posts, and comments (sentiment and topic) on r/LivestreamFail and then investigate the comment data and emote use from twitch clips that were featured in LSF posts. 
+
+
+# Goals
 
 
 
+
+
+## Libraies Used
 
 ```{r libraries,message=FALSE,error=FALSE,warning=FALSE}
 library(pacman)
@@ -33,55 +47,49 @@ p_load(tidyverse,
 
 ```
 
+# Reddit Data: r/LivestreamFail ----
+
+LSF STUFF SHOULD GO HERE. 
+
+
+
+
+# Twitch Data
 
 ```{r putting the clips together, include= FALSE,message=FALSE,error=FALSE,warning=FALSE}
+data <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/chats.csv?token=ALDJHKSJA5XLXUNZ65H7QJ27YMUNG",col_types = cols(X1 = col_skip()))
 
-file_names = dir("C:/Users/macia/Documents/twitch_clips/October Clips")
+glimpse(data)
 
-G_path = "C:/Users/macia/Documents/twitch_clips/October Clips/"
-data = NULL
-
-for(i in file_names){
-  L_path = paste(G_path,as.character(i),sep = "")
-  data_temp <- fromJSON(as.character(L_path))
-  
-  chat_temp <- data_temp$comments$message$body
-  user_temp <- data_temp$comments$commenter$display_name
-  date_temp <- data_temp$comments$commenter$created_at
-  streamer_temp <- data_temp$streamer$name
-  
-  #------------- This was me tyring to pull out the user bages ( Moderator/subcriber etc..)
-  # for(i in 1:length(data_temp$comments$message$user_badges)){
-  #  id_temp = list(data_temp$comments$message$user_badges[[i]]$`_id`)
-  #  id = c(test,id_temp)
-    
-    
-   # }
-  
-  data_temp = data.frame("body"= chat_temp,"user"=user_temp,"date"=date_temp,"streamer" = streamer_temp, stringsAsFactors = F)
-  #assign(paste(i,"data",sep = "_"),data_temp) # this will create new dataframes in the environment
-  data = bind_rows(data,data_temp)
-
-}
-
-rm(data_temp,chat_temp,data_temp,file_names,G_path,i,L_path,streamer_temp,user_temp,date_temp)
-
-
-data %>% glimpse(width = 50)
 
 ```
-# Talk about the Data here. 
+## Twitch Data: The collection
 
-- Body is the message of the chat
-- User is the ... I think I talked about this in another file. 
+tl;dr - twich dmca issues, streamer bans, and the app I used prevented me from downloading alot more data. 
+
+
+Reddit data was gathered using python and PRAW (Python Reddit API Wrapper) to gather recent data from r/LivestreamFail (October 2020). This resulted in over 900 reddit posts. This data was then used in R scrape links and document if the clips had chat available for download. 
+
+To actually download the twitch chat, I used application by lay295 and zigagrcar on github found [here](https://github.com/lay295/TwitchDownloader). 
+
+The Digital Millennium Copyright Act is affecting twitch in a big way. 
+
+Twitch is currenly in hot water with DMCA claims, and they are banning streamers for repeated streaming "copyrighted" songs. One method streamers use to combat this is by deleting their content shortly after it was broadcasted. This affected data collection since the collected twitch clips were being actively taken down.    
+
+This led to the collection of twitch chat from 227 links present in from the reddit posts. 
+
+
+## Emote Data
+
+R and Rselenium was used to scrape the emote data from FrankerFaceZ and BettertwitchTV. Roughly the Top 300 emotes used from each site was collected (emote name and link to image). 
 
 ```{r emote data from git lfs, include= FALSE,message=FALSE,error=FALSE,warning=FALSE}
 
 # gotta change these tokens :(, maybe have a git auth? This data is being read from github, and uses git lfs. 
 
-emote_data_bttv <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/bttv_emotes.csv?token=ALDJHKWDI54NLBT7UUU55E27YGTMG") 
+emote_data_bttv <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/bttv_emotes.csv?token=ALDJHKXW5TPPBWUZGDD4BH27YMUFY") 
 
-emote_data_ffz <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/ffz_emotes.csv?token=ALDJHKRP2VJN52LHK7F3UQS7YGTJU")
+emote_data_ffz <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/ffz_emotes.csv?token=ALDJHKWOIPMIYJFR3UHDLDK7YMUG4")
 
 emote_data <- emote_data_ffz %>% full_join(emote_data_bttv, by = "emote_name") %>% select(-c(X1.x,X1.y)) %>% distinct(emote_name,.keep_all = T)%>% 
   mutate(emote_name = str_to_lower(emote_name))
@@ -89,9 +97,16 @@ emote_data <- emote_data_ffz %>% full_join(emote_data_bttv, by = "emote_name") %
 rm(emote_data_bttv,emote_data_ffz)
 
 ```
+<br>
+
+![what chat looks like](https://camo.githubusercontent.com/f81d41dfadf8299f8bd4d741b6e3112cc6b50dbc531658ee5bf418c8cddf8b42/68747470733a2f2f692e696d6775722e636f6d2f49345a3262576f2e676966)
 
 
-# Talk about this data table
+<br>
+
+### Looking at twitch emotes
+
+bttv emotes need to be updated, also not sure if gif emotes work. 
 
 ```{r emote datatable,message=FALSE,warning=FALSE}
 
@@ -105,15 +120,87 @@ datatable(test, escape = FALSE)
 
 ```
 
-# Tokens of the text
+## Descriptions of twitch chat
 
 
-only keeping all alphabetical characters, excludes numbers and punct. Still keeing stop words for now. 
+This chart shows us how many unique chat lines there are per streamer. This metric is useful for understanding which streamers may be getting the most attention during a point in time on LSF. Thought this metric should later be controlled for clip length, since longer clips offer more opprotunity for chat engagement.
+
+
+```{r, fig.width=10}
+
+data %>% group_by(streamer) %>%  count(sort = T)%>%
+  head(n=10) %>% 
+  ggplot(aes(x = reorder(streamer,-n), y = n))+
+  geom_col()+
+  theme_wsj(base_size = 12, color = "green")+
+  theme(axis.text.x = element_text(size = 12, angle = 15,vjust = .55))+
+  labs(title = "Which streamer has the most chats?")
+  
+
+```
+<br>
+
+This visualization show us the most active twitch chatters in our dataset. In a larger dataset, finding those high-interactcion chatters maybe useful for drawing links between communities or even creating a contributer badges on twith (like the founders badge). 
 
 <br>
 
-Talk about the observations
+```{r}
 
+# This creates a !%in% kind of deal
+`%notin%` <- Negate(`%in%`)
+
+data %>% group_by(user) %>% filter(user %notin% c("StreamElements","Streamlabs","Nightbot")) %>%  count(sort = T) %>%
+  head(n=10)%>% 
+  ggplot(aes(x = reorder(user,-n), y = n))+
+  geom_col()+
+  theme_wsj(base_size = 12, color = "green")+
+  theme(axis.text.x = element_text(size = 8, angle = 15,vjust = .55),
+        plot.title = element_text(size = 20))+
+  labs(title = "Which user has the most chats?")
+# Streamelements and streamlabs are bots. 
+
+
+```
+
+## Out of the 100 clips, which users can be seen in multiple high scoring clips. Or users seen in multiple chats. 
+
+REVISIT THIS ONE
+
+```{r}
+
+data %>% group_by(streamer,user) %>% count(sort = T) %>% head(n = 10)
+
+```
+
+<br>
+
+ This plot will give us further insight in the the demographics of the communities of top 5 streamers. This shows the number accounts created by year for each member of the chat by streamer. As an example, one conclusion that may be drawn is that streamers forsen and Mizkif are not attracting new accounts (New user/ban evaders) to their channels. Another conclusion that may be drawn is that Trainwreckstv in 2018, attracted alot of new users, and perhaps played a significant role in bringing new users to twitch. I should investigate futher to understand what happened with train in 2018. This was perhaps his drama year with MitchJones (A popular WOW streamer) or *The Speech*. 
+
+
+
+<br>
+
+```{r}
+
+top_5_streamers <- data %>% group_by(streamer) %>% count(sort = T) %>% head(n=5) %>% distinct(streamer)
+
+
+data %>% filter(streamer %in% top_5_streamers$streamer) %>% mutate(date_year = year(as.Date.character(date))) %>% group_by(date_year,streamer) %>% count(sort = T)%>%
+  ggplot(aes(x = date_year, y = n, color = streamer)) + 
+  geom_line(size = 2)+
+  theme_wsj(base_size = 12, color = "green")+
+  labs(title = "Streamer Communities: Account Creation Dates", subtitle = "Top 5 Streamers")+
+  theme(plot.title = element_text(size = 15),plot.subtitle = element_text(size= 8),legend.title = element_blank(),legend.position = "bottom")
+
+
+```
+
+<br>
+
+Tokens, bigrams and trigrams can give us insign into popular emotes/words and spams that occur in these chats. 
+
+
+<br>
 
 ```{r, message=FALSE,warning=FALSE}
 tokens <- data %>%
@@ -125,44 +212,49 @@ tokens %>% glimpse(width = 50)
 ```
 
 
-## Out of the 100 clips, which streamer has the most chats?
 
-```{r, fig.width=10}
+```{r}
 
-data %>% group_by(streamer) %>%  count(sort = T)%>%
+tokens %>% group_by(word) %>% count(sort = T)%>%
   head(n=10) %>% 
-  ggplot(aes(x = streamer, y = n))+
+  ggplot(aes(x= reorder(word,-n),y=n))+
   geom_col()+
   theme_wsj(base_size = 12, color = "green")+
-  theme(axis.text.x = element_text(size = 12, angle = 15,vjust = .55))+
-  labs(title = "Which streamer has the most chats?")
-  
-
-```
-## Out of the 100 clips, which user has the most chats?
-
-```{r}
-
-data %>% group_by(user) %>%  count(sort = T)%>%
-  head(n=10)%>% 
-  ggplot(aes(x = user, y = n))+
-  geom_col()+
-  theme_wsj(base_size = 12, color = "green")+
-  theme(axis.text.x = element_text(size = 8, angle = 15,vjust = .55),
-        plot.title = element_text(size = 20))+
-  labs(title = "Which user has the most chats?")
-# Streamelements and streamlabs are bots. 
-
+  theme(axis.text.x = element_text(angle = 25))+
+  labs(title ="Token Counts")
 
 ```
 
-## Out of the 100 clips, which users can be seen in multiple high scoring clips
-
-REVISIT THIS ONE
 
 ```{r}
 
-data %>% group_by(streamer,user) %>% count(sort = T) %>% head(n = 10)
+data %>%
+  unnest_tokens(bigram,body,token = 'ngrams',n = 2)%>% 
+  filter(str_detect(bigram,"^[:alpha:]")) %>% 
+  group_by(bigram) %>% count(sort = T)%>%
+  head(n=10) %>% 
+  ggplot(aes(x= reorder(bigram,-n),y=n))+
+  geom_col()+
+  theme_wsj(base_size = 12, color = "green")+
+  theme(axis.text.x = element_text(angle = 25,size = 9))+
+  labs(title ="Bigram Counts")
+
+
+```
+
+
+```{r}
+
+data %>%
+  unnest_tokens(trigram,body,token = 'ngrams',n = 3)%>% 
+  filter(str_detect(trigram,"^[:alpha:]")) %>% 
+  group_by(trigram) %>% count(sort = T)%>%
+  head(n=10) %>% 
+  ggplot(aes(x= reorder(trigram,-n),y=n))+
+  geom_col()+
+  theme_wsj(base_size = 12, color = "green")+
+  theme(axis.text.x = element_text(angle = 25,size = 9))+
+  labs(title ="trigram Counts")
 
 ```
 
