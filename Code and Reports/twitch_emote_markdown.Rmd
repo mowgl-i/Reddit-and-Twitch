@@ -5,10 +5,13 @@ date: "11/27/2020"
 output: 
   html_document:
     toc: true
+    toc_float: true
+    toc_depth: 2
+    number_sections: true
     code_folding: "hide"
 ---
 
-# Maybe add a special logo here? Twitch x LSF thing idk
+![](C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Code and Reports/logoo.png)
 
 # Getting Started
 
@@ -18,14 +21,7 @@ One subreddit called LivestreamFail (LSF) is a dedicated subreddit where users s
 
 This analysis will investigate users, posts, and comments (sentiment and topic) on r/LivestreamFail and then investigate the comment data and emote use from twitch clips that were featured in LSF posts. 
 
-
-# Goals
-
-
-
-
-
-## Libraies Used
+*unfold the code block to see which libraries are used*
 
 ```{r libraries,message=FALSE,error=FALSE,warning=FALSE}
 library(pacman)
@@ -43,29 +39,30 @@ p_load(tidyverse,
        igraph,
        ggraph,
        DT,
-       ggthemes)
+       ggthemes,
+       readtext)
 
 ```
 
-# Reddit Data: r/LivestreamFail ----
+# Reddit Data: r/LivestreamFail
 
 LSF STUFF SHOULD GO HERE. 
 
 
 
 
-# Twitch Data
+# Twitch
 
 ```{r putting the clips together, include= FALSE,message=FALSE,error=FALSE,warning=FALSE}
-data <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/chats.csv?token=ALDJHKSJA5XLXUNZ65H7QJ27YMUNG",col_types = cols(X1 = col_skip()))
+data <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/chats.csv?token=ALDJHKVLC7FP65R26NQU3AC7YXNO6",col_types = cols(X1 = col_skip()))
 
 glimpse(data)
 
 
 ```
-## Twitch Data: The collection
+## Twitch: Data collection
 
-tl;dr - twich dmca issues, streamer bans, and the app I used prevented me from downloading alot more data. 
+**tl;dr - twich dmca issues, streamer bans, and the app I used prevented me from downloading alot more data. Next time, I'll work with the twitch api directly.**
 
 
 Reddit data was gathered using python and PRAW (Python Reddit API Wrapper) to gather recent data from r/LivestreamFail (October 2020). This resulted in over 900 reddit posts. This data was then used in R scrape links and document if the clips had chat available for download. 
@@ -87,9 +84,9 @@ R and Rselenium was used to scrape the emote data from FrankerFaceZ and Bettertw
 
 # gotta change these tokens :(, maybe have a git auth? This data is being read from github, and uses git lfs. 
 
-emote_data_bttv <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/bttv_emotes.csv?token=ALDJHKXW5TPPBWUZGDD4BH27YMUFY") 
+emote_data_bttv <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/bttv_emotes.csv?token=ALDJHKV45DQ5LSGKNJFDV4S7YXNPA") 
 
-emote_data_ffz <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/ffz_emotes.csv?token=ALDJHKWOIPMIYJFR3UHDLDK7YMUG4")
+emote_data_ffz <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/ffz_emotes.csv?token=ALDJHKVGN5J5L6JCKPXN3XS7YXNPE")
 
 emote_data <- emote_data_ffz %>% full_join(emote_data_bttv, by = "emote_name") %>% select(-c(X1.x,X1.y)) %>% distinct(emote_name,.keep_all = T)%>% 
   mutate(emote_name = str_to_lower(emote_name))
@@ -99,12 +96,16 @@ rm(emote_data_bttv,emote_data_ffz)
 ```
 <br>
 
+**This is what a "busy" chat may look like.** 
 ![what chat looks like](https://camo.githubusercontent.com/f81d41dfadf8299f8bd4d741b6e3112cc6b50dbc531658ee5bf418c8cddf8b42/68747470733a2f2f692e696d6775722e636f6d2f49345a3262576f2e676966)
 
 
 <br>
 
-### Looking at twitch emotes
+### Emote data table
+
+This is a data table with the names and images of the top 600 emotes from both sites (BTTV & FFZ) combined. 
+
 
 bttv emotes need to be updated, also not sure if gif emotes work. 
 
@@ -120,10 +121,13 @@ datatable(test, escape = FALSE)
 
 ```
 
+<br>
+
+---
+
 ## Descriptions of twitch chat
 
-
-This chart shows us how many unique chat lines there are per streamer. This metric is useful for understanding which streamers may be getting the most attention during a point in time on LSF. Thought this metric should later be controlled for clip length, since longer clips offer more opprotunity for chat engagement.
+This chart shows us how many unique chat lines there are per streamer. This metric is useful for understanding which streamers may be getting the most attention during a point in time on LSF (October in this case). This metric should later be controlled for clip length, since longer clips offer more opprotunity for chat engagement.
 
 
 ```{r, fig.width=10}
@@ -144,7 +148,7 @@ This visualization show us the most active twitch chatters in our dataset. In a 
 
 <br>
 
-```{r}
+```{r, fig.width=10}
 
 # This creates a !%in% kind of deal
 `%notin%` <- Negate(`%in%`)
@@ -162,25 +166,39 @@ data %>% group_by(user) %>% filter(user %notin% c("StreamElements","Streamlabs",
 
 ```
 
-## Out of the 100 clips, which users can be seen in multiple high scoring clips. Or users seen in multiple chats. 
-
-REVISIT THIS ONE
-
-```{r}
-
-data %>% group_by(streamer,user) %>% count(sort = T) %>% head(n = 10)
-
-```
-
 <br>
 
  This plot will give us further insight in the the demographics of the communities of top 5 streamers. This shows the number accounts created by year for each member of the chat by streamer. As an example, one conclusion that may be drawn is that streamers forsen and Mizkif are not attracting new accounts (New user/ban evaders) to their channels. Another conclusion that may be drawn is that Trainwreckstv in 2018, attracted alot of new users, and perhaps played a significant role in bringing new users to twitch. I should investigate futher to understand what happened with train in 2018. This was perhaps his drama year with MitchJones (A popular WOW streamer) or *The Speech*. 
 
 
+```{r multi-stream chatters}
+data %>% 
+  add_count(user,streamer) %>% 
+  filter(n>1,user %notin% c("StreamElements","Streamlabs","Nightbot","Fossabot")) %>% 
+  group_by(user) %>%
+  add_count(n_distinct(streamer)) %>% 
+  ungroup() %>% 
+  top_n(`n_distinct(streamer)`, n = 2) %>% 
+  arrange(desc(n)) %>%
+  filter(n >=20) %>% 
+  add_count(user,streamer,name = "#_chat_per_clip") %>% 
+  ggplot(aes(x = user, y = `#_chat_per_clip`, fill = streamer))+
+  geom_bar(position = "stack",stat = "identity")
+
+data %>% filter(user ==  "hiteki") %>% 
+  group_by(streamer) %>% count()
+
+data %>% filter(user ==  "hiteki") %>% 
+  summarise(count = n_distinct(streamer))
+
+
+```
+
+
 
 <br>
 
-```{r}
+```{r,fig.width=10}
 
 top_5_streamers <- data %>% group_by(streamer) %>% count(sort = T) %>% head(n=5) %>% distinct(streamer)
 
@@ -197,7 +215,8 @@ data %>% filter(streamer %in% top_5_streamers$streamer) %>% mutate(date_year = y
 
 <br>
 
-Tokens, bigrams and trigrams can give us insign into popular emotes/words and spams that occur in these chats. 
+
+Tokens, bigrams and trigrams can give us insign into popular emotes/words combinations and spams that occur in these chats. 
 
 
 <br>
@@ -213,7 +232,7 @@ tokens %>% glimpse(width = 50)
 
 
 
-```{r}
+```{r, fig.width=10}
 
 tokens %>% group_by(word) %>% count(sort = T)%>%
   head(n=10) %>% 
@@ -226,7 +245,7 @@ tokens %>% group_by(word) %>% count(sort = T)%>%
 ```
 
 
-```{r}
+```{r, fig.width=10}
 
 data %>%
   unnest_tokens(bigram,body,token = 'ngrams',n = 2)%>% 
@@ -243,7 +262,7 @@ data %>%
 ```
 
 
-```{r}
+```{r, fig.width=10}
 
 data %>%
   unnest_tokens(trigram,body,token = 'ngrams',n = 3)%>% 
@@ -255,6 +274,230 @@ data %>%
   theme_wsj(base_size = 12, color = "green")+
   theme(axis.text.x = element_text(angle = 25,size = 9))+
   labs(title ="trigram Counts")
+
+```
+
+As you can see, there are alot of duplicated words/phrases. I like to think of these as spams. 
+
+Some popular ones are "I was here Pogu I was here Pogu..." or "OMEGALUL OMEGALUL OMEGALUL OMEGALUL..". One way to combat this is by stripping the chat text to only it's unique words. 
+
+## Comparisons of twitch chat
+
+
+### Word/Emote correlations
+
+
+```{r,warning=FALSE,error=FALSE,message=FALSE}
+
+
+corpus_data <- readtext("C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/corpus_data.csv", text_field = 'text')
+glimpse(corpus_data)
+
+
+corpus <- corpus(corpus_data)
+
+
+dfm <- dfm(corpus, remove_punct=T)
+
+# Select emotes
+emotes = emote_data$emote_name
+
+tags = dfm_select(dfm,pattern = emotes)
+
+#tags
+
+toptag = names(topfeatures(tags,30))
+
+# These are the top emotes mentioned in the dataset from the list of popular bttv/ffz emotes
+head(toptag)
+
+```
+
+
+
+### Emote Combinations
+
+```{r}
+tag_fcm <- fcm(tags)
+
+toptags_fcm <- fcm_select(tag_fcm, pattern = toptag)
+textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.7, edge_size = 5)
+
+```
+
+
+### Emote/word combinations
+
+```{r}
+
+tags = dfm_select(dfm, pattern = c("£","â","<","ó","ðÿ"),selection = "remove")
+
+#tags
+
+toptag = names(topfeatures(tags,20))
+
+
+tag_fcm <- fcm(tags)
+
+toptags_fcm <- fcm_select(tag_fcm, pattern = toptag)
+textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.7, edge_size = 5)
+
+```
+
+### Directed Bi-gram network
+
+
+```{r, fig.width=10,fig.height=10}
+
+count_bigrams <- function(data) {
+  data %>%
+    unnest_tokens(bigram,"body", token = "ngrams", n = 2) %>%
+    separate(bigram, c("word1", "word2"), sep = " ") %>%
+    count(word1, word2, sort = TRUE)
+}
+
+visualize_bigrams <- function(bigrams) {
+  set.seed(2020)
+  a <- grid::arrow(type = "closed", length = unit(.15, "inches"))
+
+  bigrams %>%
+    graph_from_data_frame() %>%
+    ggraph(layout = "fr") +
+    geom_edge_link(aes(edge_alpha = n), show.legend = FALSE, arrow = a) +
+    geom_node_point(color = "lightblue", size = 5) +
+    geom_node_text(aes(label = name), vjust = 1, hjust = 1) +
+    theme_void()
+}
+
+viz.bigrams <- data %>%
+  count_bigrams()
+
+# filter out rare combinations, as well as digits and produce graph
+viz.bigrams %>%
+  filter(n >70) %>%
+  visualize_bigrams()
+```
+
+<br>
+
+```{r}
+
+word_cors <- tokens %>%
+  group_by(word) %>%
+  filter(n() >= 10 ) %>%
+  pairwise_cor(word, streamer, sort = T)#, sort = TRUE)
+
+top_10 <-word_cors %>% mutate("streamer" = case_when(
+  item2 == "trainwreckstv" ~ "trainwreckstv", # ahh, 
+  item2 == "esfandtv" ~ "esfandtv",
+  item2 == "forsen" ~ "forsen",
+  item2 == "mizkif" ~ "mizkif",
+  item2 == "ludwig" ~ "ludwig",
+  item2 == "moonmoon" ~ "moonmoon",
+  item2 == "xqcow" ~ "xqcow",
+  item2 == "sykkuno" ~ "sykkuno",
+  item2 == "vadikus007" ~ "vadikus007",
+  item2 == "loltyler1" ~ "loltyler1",
+  TRUE ~ "WHO?"
+)) # there are 83 unique streamers in the dataset, we should filter this some how. Either top 20, or maybe with chats > 100. 
+# Build a scraper that grabes the names of emotes for eache of the streamers?
+#top_10 %>% group_by(streamer) %>% count() # strange numbers here, each streamer has same number?, because I filteer for top 10 above?
+ # from 2 mil rows
+ # to about 2k rows
+test<-top_10 %>%
+  mutate(contains_emote = case_when(item1 %in% emote_data$emote_name ~ 1, TRUE ~ 0)) %>% 
+  filter(contains_emote == 1) %>% # filtering for only emotes!
+  filter(streamer != "WHO?")%>%
+  group_by(streamer) %>% top_n(10,wt = correlation)
+
+streamers = c("trainwreckstv","esfandtv","forsen","mizkif","ludwig","moonmoon","xqcow","sykkuno","vadikus007","loltyler1")
+
+emote_data_1 <- emote_data %>% select(emote_name,emote_link) %>% na.omit()
+
+# TEST 2
+test_2 <- test %>% left_join(emote_data_1, by = c("item1" = "emote_name"))
+#-------
+
+test <- test %>% graph_from_data_frame()
+test_viz <- toVisNetworkData(test)
+
+test_viz$nodes <- test_viz$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"))
+#test_viz checking the dataframe
+visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
+  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
+  visGroups(groupname = "Emote", color = "blue")%>%
+  visOptions(highlightNearest = list(enabled = T, hover = T))%>%
+  visLegend()
+
+#--------------------
+```
+
+```{r}
+
+test_2 <- test_2 %>% graph_from_data_frame()
+
+test_viz_2 <- toVisNetworkData(test_2)
+
+
+test_viz_2$nodes %>% distinct()
+test_viz_2$edges %>% distinct()
+test_viz_2$nodes <- test_viz_2$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"),
+                                                "shape" = "image")
+
+#test_viz_2$nodes <-
+test_viz_2$nodes<-test_viz_2$nodes %>% left_join(test_viz_2$edges, by = c('id' = 'from')) %>% select(id,label,group,shape,emote_link) %>% rename(image = emote_link) %>% distinct(id, .keep_all = T)
+test_viz_2$nodes %>% distinct()
+#test_viz_2 checking the dataframe
+visNetwork(nodes = test_viz_2$nodes, edges = test_viz_2$edges, main = "Emote correlation to Streamer")%>%
+  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
+  visGroups(groupname = "Emote", color = "blue")%>%
+  visOptions(highlightNearest = list(enabled = T, hover = T))%>%
+  visLegend()
+
+
+
+
+```
+
+```{}
+
+# delete me at some point
+
+test<-top_10 %>%
+  mutate(contains_emote = case_when(item1 %in% emote_data$emote_name ~ 1, TRUE ~ 0)) %>% 
+  filter(contains_emote == 1) %>% # filtering for only emotes!
+  filter(streamer != "WHO?")%>%
+  inner_join(emote_data, by = c("item1" = "emote_name")) %>% 
+  filter(emote_link != is.na(emote_link)) %>% 
+  group_by(streamer) %>% top_n(10,wt = correlation) %>%
+  graph_from_data_frame()# %>%
+ # ggraph(layout = "fr") +
+ # geom_edge_link(aes(edge_alpha = correlation), show.legend = FALSE) +
+ #  geom_node_point(aes(color = streamer), size = 5) +
+ #  geom_node_text(aes(label = name), repel = TRUE) +
+ #  theme_void()
+
+streamers = c("trainwreckstv","esfandtv","forsen","mizkif","ludwig","moonmoon","xqcow","sykkuno","vadikus007","loltyler1")
+
+test_viz <- toVisNetworkData(test)
+
+test_viz$edges
+test_viz$nodes
+test_viz$nodes <- test_viz$nodes %>% 
+  mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"),
+                                            "shape" = "image") %>% 
+  inner_join(test_viz$edges, by = c("id" = "from")) %>%
+  select(c(id,label,group,shape,emote_link))%>%
+  mutate("image" = magick::image_read(emote_link))
+
+
+
+#test_viz checking the dataframe
+visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
+  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
+  visGroups(groupname = "Emote", color = "blue")%>%
+  visOptions(highlightNearest = list(enabled = T, hover = T))%>%
+  visLegend()
 
 ```
 
