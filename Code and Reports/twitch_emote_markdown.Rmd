@@ -11,7 +11,7 @@ output:
     code_folding: "hide"
 ---
 
-<font size="10">**Using r/LivestreamFail to understand twitch streamers,chat and emotes.** </font>
+<font size="8">**Using r/LivestreamFail to understand twitch streamers,chat and emotes.** </font>
 
 ***
 
@@ -44,8 +44,7 @@ p_load(tidyverse,
        ggraph,
        DT,
        ggthemes,
-       readtext,
-       knitr)
+       readtext)
 
 ```
 
@@ -58,11 +57,11 @@ LSF STUFF SHOULD GO HERE.
 
 # Twitch
 
-```{r putting the clips together,message=FALSE,error=FALSE,warning=FALSE,tidy=TRUE}
+```{r putting the clips together,message=FALSE,error=FALSE,warning=FALSE}
 data <- read_csv("C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/chats.csv",col_types = cols(X1 = col_skip()))
 
-kable(glimpse(data))
-
+head(data, n = 10)
+glimpse(data)
 
 ```
 ## Twitch: Data collection
@@ -83,7 +82,7 @@ This led to the collection of twitch chat from 227 links present in from the red
 
 ## Emote Data
 
-R and Rselenium was used to scrape the emote data from FrankerFaceZ and BettertwitchTV. Roughly the Top 300 emotes used from each site was collected (emote name and link to image). 
+R and Rselenium was used to scrape the emote data from [FrankerFaceZ](https://www.frankerfacez.com/emoticons/?q=&sort=count-desc&page=1) and [BettertwitchTV](https://betterttv.com/emotes/top). Roughly the Top 300 emotes used from each site was collected (emote name and link to image). 
 
 ```{r emote data from git lfs, include= FALSE,message=FALSE,error=FALSE,warning=FALSE}
 
@@ -320,8 +319,9 @@ head(toptag)
 ```
 
 
+### Text Plot Networks {.tabset .tabset-pills}
 
-### Emote Combinations
+#### Emote Combinations
 
 ```{r, warning=FALSE,message=FALSE,error=FALSE}
 tag_fcm <- fcm(tags)
@@ -332,7 +332,7 @@ textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.7, edge_size = 5)
 ```
 
 
-### Emote/word combinations
+#### Emote/word combinations
 
 ```{r, warning=FALSE,message=FALSE,error=FALSE}
 
@@ -350,8 +350,11 @@ textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.7, edge_size = 5)
 
 ```
 
+###{-}
+
 ### Directed Bi-gram network
 
+The Previous plots don't show us the direction of the combinations. This is useful to understand the order of emotes/spams. Otherwise, one may think that Clap EZ is an acceptable spam.  
 
 ```{r, fig.width=10,fig.height=10, warning=FALSE, message=FALSE}
 
@@ -385,6 +388,11 @@ viz.bigrams %>%
 ```
 
 <br>
+
+### Streamer emote comparisons
+
+With this vizualization, I aimed to uncover the "shared" emotes between streamers/comunties. For example, we can see that the streamer EsfandTv shares alot of emotes with different streamers and may share many community members with TrainwrecksTv.  
+
 
 ```{r}
 
@@ -438,14 +446,27 @@ visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correla
 #--------------------
 ```
 
-```{r, include=FALSE,eval=FALSE}
+```{r, fig.height= 10, fig.width= 10, warning=FALSE, message=FALSE}
 
 test_2 <- test_2 %>% graph_from_data_frame()
 test_viz_2 <- toVisNetworkData(test_2)
 test_viz_2$nodes <- test_viz_2$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"),
                                                 "shape" = "image")
 
-test_viz_2$nodes<-test_viz_2$nodes %>% left_join(test_viz_2$edges, by = c('id' = 'from')) %>% select(id,label,group,shape,emote_link) %>% rename(image = emote_link) %>% distinct(id, .keep_all = T)
+test_viz_2$nodes<-test_viz_2$nodes %>% left_join(test_viz_2$edges, by = c('id' = 'from')) %>% select(id,label,group,shape,emote_link) %>% rename(image = emote_link) %>% distinct(id, .keep_all = T) 
+
+
+test_viz_2$nodes<-test_viz_2$nodes %>% mutate(image = case_when(id == "xqcow" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/xqcow-profile_image-9298dca608632101-70x70.jpeg",
+                                              id == "loltyler1" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/f3591dbe4ee3d94b-profile_image-70x70.png",
+                                              id == "moonmoon" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/3973e918fe7cc8c8-profile_image-70x70.png",
+                                              id == "trainwreckstv" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/1f47965f-7961-4b64-ad6f-71808d7d7fe9-profile_image-70x70.png",
+                                              id == "forsen" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/forsen-profile_image-48b43e1e4f54b5c8-300x300.png",
+                                              id == "esfandtv" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/476ee93d-66a6-4e57-b3a9-db1ceb168ad8-profile_image-70x70.png",
+                                              id == "mizkif" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/ddd88d33-6c4f-424f-9246-5f4978c93148-profile_image-70x70.png",
+                                              id == "ludwig" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/bde8aaf5-35d4-4503-9797-842401da900f-profile_image-70x70.png",
+                                              id == "sykkuno" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/sykkuno-profile_image-6ab1e70e07e29e9b-70x70.jpeg",
+                                              TRUE ~ as.character(image))) %>%  na.omit()
+
 
 #test_viz_2 checking the dataframe
 visNetwork(nodes = test_viz_2$nodes, edges = test_viz_2$edges, main = "Emote correlation to Streamer")%>%
@@ -454,39 +475,22 @@ visNetwork(nodes = test_viz_2$nodes, edges = test_viz_2$edges, main = "Emote cor
   visOptions(highlightNearest = list(enabled = T, hover = T))%>%
   visLegend()
 
-
-
+#test_viz_2$nodes
 
 ```
+
+
 
 ```{}
 
 # delete me at some point
-
-test<-top_10 %>%
-  mutate(contains_emote = case_when(item1 %in% emote_data$emote_name ~ 1, TRUE ~ 0)) %>% 
-  filter(contains_emote == 1) %>% # filtering for only emotes!
-  filter(streamer != "WHO?")%>%
-  inner_join(emote_data, by = c("item1" = "emote_name")) %>% 
-  filter(emote_link != is.na(emote_link)) %>% 
-  group_by(streamer) %>% top_n(10,wt = correlation) %>%
-  graph_from_data_frame()# %>%
- # ggraph(layout = "fr") +
- # geom_edge_link(aes(edge_alpha = correlation), show.legend = FALSE) +
- #  geom_node_point(aes(color = streamer), size = 5) +
- #  geom_node_text(aes(label = name), repel = TRUE) +
- #  theme_void()
-
-streamers = c("trainwreckstv","esfandtv","forsen","mizkif","ludwig","moonmoon","xqcow","sykkuno","vadikus007","loltyler1")
-
-test_viz <- toVisNetworkData(test)
 
 test_viz$edges
 test_viz$nodes
 test_viz$nodes <- test_viz$nodes %>% 
   mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"),
                                             "shape" = "image") %>% 
-  inner_join(test_viz$edges, by = c("id" = "from")) %>%
+  inner_join(test_viz$edges, by = c("id" = "from"))# %>%
   select(c(id,label,group,shape,emote_link))%>%
   mutate("image" = magick::image_read(emote_link))
 
