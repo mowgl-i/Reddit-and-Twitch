@@ -1,6 +1,6 @@
 
 During the data collection many streamers opted to delete VODS and clips due to the current DMCA climate on Twitch.
-This interupped data collection and the end result was chat messages from 227 Clips. 
+This interupped data collection and the end result was chat messages from 227 Clips. Also *lsf* is short for r/LivestreamFail. 
 
 **All .csv files are stored using git lfs. I assume that you also need it installed if you plan to clone this repo.**
 
@@ -46,12 +46,12 @@ Data Download
 
 # Exact file names and content
  - October_clips_thr_20th.csv = recent r/livestreamfail posts to follow and scrape
- - ClipscrapeV1.csv = scraped lsf posts/twich clips which indentify which clips are scrape-able
+ - ClipscrapeV1.csv = scraped r/livestreamfail posts/twich clips which indentify which clips are scrape-able
  - chats.csv = scraped chat from clipscrapeV1.csv
  - corpus_data.csv  = chats.csv in corpus form
  - bttv_emotes.csv = emote information from *Better Twitch TV*. top 300~ ish emotes. 
  - ffz_emotes.csv = emote information from *FrankerfaceZ*. top 300~ ish emotes. 
- - lsf_posts.csv = r/livestreamfail posts pulled from pushshift dataset 
+ - lsf_data.csv = r/livestreamfail posts pulled from pushshift dataset 
  - lsf_data_comments = r/livestreamfail comments pulled from pushshift dataset 
 
 
