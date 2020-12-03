@@ -4,6 +4,7 @@ This interupped data collection and the end result was chat messages from 227 Cl
 
 **All .csv files are stored using git lfs. I assume that you also need it installed if you plan to clone this repo.**
 
+![ok..gotit](https://cdn.betterttv.net/emote/5e3026505ea23e51ed8c6617/3x)
 
 # Ignore
 pls ignore these things :)
@@ -42,8 +43,6 @@ Data Download
  ## Emote related files
  Scripts that scrape better twitch tv and frankerfacez. 
  - emote_name_image_scrape.R
-
-![ok..gotit](https://cdn.betterttv.net/emote/5e3026505ea23e51ed8c6617/3x)
 
 # Exact file names and content
  - October_clips_thr_20th.csv = recent r/livestreamfail posts to follow and scrape
