@@ -13,8 +13,9 @@ Useful links
    - Full on app that can grab video too
    - Useful for twitch to youtube content with chat
    
- -[Twitch chat grabber](https://github.com/OgulcanCelik/twitch-clip-chat/tree/master/app)
- 
+ Great paper on emote sentiment. 
  -[Twitch emote sentiment for top 100 emotes on most popular streamers](https://github.com/konstantinkobs/emote-controlled)
  
- -[Emote Viz](https://github.com/AdamSpannbauer/twitch_packed_bar)
+ All .csv files are tracked using git lfs. This is my first time using it, so if you intend to clone this repo, please makesure you download it. Since some files are quite large. Feel free to download the html render of the document to view code used in this project. 
+ 
+ This project leverages R, Python, Bigquery and the Pushshift dataset. 
