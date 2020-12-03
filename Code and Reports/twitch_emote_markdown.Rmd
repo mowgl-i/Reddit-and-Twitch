@@ -20,7 +20,7 @@ output:
 
 Recently, twitch literature has begun characterizing twitch communities through twitch chat, viewership trends, and content but no known projects have used resources that exist outside of twitch to understand how twitch communities manifest and interact with one another. 
 
-One subreddit called LivestreamFail (LSF) is a dedicated subreddit where users share these twitch clips, general twitch news, and twitch drama.LivestreamFail is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. I'm interested in the ways emotes are used between smaller and larger communities because I believe emote meanings and sentiments are being actively redefined. This analysis will be split into an LSF part and Twitch emote-sentiment part.  
+One subreddit called LivestreamFail (LSF) is a dedicated subreddit where users share these twitch clips, general twitch news, and twitch drama. LivestreamFail is one way smaller streamers become noticed and is a platform that I can use to compare big and small communities. I'm interested in the ways emotes are used between smaller and larger communities because I believe emote meanings and sentiments are being actively redefined. This analysis will be split into an LSF part and Twitch emote-sentiment part.  
 
 This analysis will investigate users, posts, and comments (sentiment and topic) on r/LivestreamFail and then investigate the comment data and emote use from twitch clips that were featured in LSF posts. 
 
@@ -85,9 +85,7 @@ p_load(tidyverse,
 
 ```
 
-# r/LivestreamFail
-
-Image credit: [LSF Twitter](https://twitter.com/rlivestreamfail)
+# [r/LivestreamFail](https://www.reddit.com/r/LivestreamFail/)
 
 ## LSF Data Collection
 
@@ -106,7 +104,7 @@ Image credit: [LSF Twitter](https://twitter.com/rlivestreamfail)
 
 This resulted in over 39k reddit posts and 1.4 M reddit comments. 900 posts were then used in R scrape links and document if the clips had chat available for download. 
 
-```{r, message=FALSE,echo=FALSE}
+```{r, message=FALSE,echo=FALSE,warning=FALSE}
 
 lsf_data = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data.csv")
 
@@ -141,7 +139,7 @@ rm(lsf_data_comments)
 <br>
 
 This is a plot of "Karma" which can be thought of as likes over 3 years on the subreddit. 
-As we can see, there is a growing interest in this subreddit since it's recieved more than 4 times the upvotes in 2019 than in 2016.  
+As we can see, there is a growing interest in this subreddit since it's received more than 4 times the up votes in 2019 than in 2016.  
 
 
 ```{r,warning=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
@@ -168,7 +166,7 @@ lsf_data %>% mutate(month =  as.factor(format(date, "%m")),
 
 <br>
 
-Yes there is a pattern at the monthly level! there are 2 clear peaks and dips. This information may be useful for streamers or community members to 'farm' clips or strategicly post on the reddit to maximize the oprotunity of karma or views.  
+Yes, there is a pattern at the monthly level! there are 2 clear peaks and dips. This information may be useful for streamers or community members to 'farm' clips or strategically post on the reddit to maximize the opportunity of karma or views.
 
 
 This below will show the number of duplicate links that are posted on LSF. 
@@ -187,7 +185,7 @@ which links are being posted on LSF overall?
 ```{r ,warning=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
 library(lubridate)
 lsf_data %>% group_by(domain, year(date)) %>% count() %>% filter(n>50)  %>% ggplot(aes(x = `year(date)`, y = n , color = domain ))+
-  geom_line()+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+ theme(legend.title = element_blank(),plot.subtitle = element_text(size = 10))+ labs(title = "Post Links over time.", subtitle = "Filtered for links occuring more than 50 times")
+  geom_line(size = 3, alpha = 0.5)+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+ theme(legend.title = element_blank(),plot.subtitle = element_text(size = 10))+ labs(title = "Post Links over time.", subtitle = "Filtered for links occuring more than 50 times")
 
 
 ```
@@ -195,7 +193,7 @@ lsf_data %>% group_by(domain, year(date)) %>% count() %>% filter(n>50)  %>% ggpl
 <br>
 
 
-This next visualization helps me understand which types of media are featured on the subreddit. This is great becaues we can see that alot of these posts are *Twitch* related other than the etika post, who is a famous and beloved youtuber. Also, the keanu reeves moment during his presentation at a gaming convention. 
+This next visualization helps me understand which types of media are featured on the subreddit. This is great because we can see that a lot of these posts are *Twitch* related other than the Etika post, who is a famous and beloved you-tuber. Also, the Keanu reeves moment during his presentation at a gaming convention. 
 
 <br>
 
@@ -216,7 +214,7 @@ lsf_data %>% top_n(10,wt=score) %>% filter(score < 60000) %>% ggplot(aes(x = dat
 
 #### Number of posts
 
-Normiesree has a suspisous amount of posts! Could they be reposts? Are they legit posts? perhaps he's the oldest surviving member of "top posters" on lsf, since many users were [deleted]. 
+Normiesree has a suspicious number of posts! Could they be reposting? Are they legit posts? perhaps he's the oldest surviving member of "top posters" on lsf, since many users were [deleted].
 
 ```{r , message=FALSE, warning=FALSE, fig.height= 8.5, fig.width=10}
 
@@ -239,6 +237,10 @@ lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% summarize(su
 
 ```
 
+### {-}
+
+Comparing reddit karma for popular users over time. 
+
 
 ```{r, fig.width=10,fig.height=8, message=FALSE, warning=FALSE}
 lsf_data %>%mutate(month =  as.factor(format(date, "%m")),
@@ -260,8 +262,6 @@ lsf_data %>%mutate(month =  as.factor(format(date, "%m")),
 ```
 
 
-
-### {-}
 
 
 
@@ -286,15 +286,15 @@ lsf_data %>%
    filter(year %notin% c("2016","2017")) %>% 
   ggplot(aes(x=month, y = `total score`, group = streamer,color = streamer))+geom_line(size = 2,alpha = 0.7)+
   facet_wrap(vars(year),nrow = 1, ncol = 4,strip.position = "bottom") + theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+ theme(legend.title = element_blank(),legend.position = "bottom")+
-  labs(title = "Karma over time for posts containing 'relevant' streamers")
+  labs(title = "Reddit karma over time", subtitle = "for posts containing 'relevant' streamers")
   
 
 ```
 
 <br>
 
-## Comments: Biterm Topic modeling for short texts. 
-not currently working
+## LSF Comments: Biterm Topic modeling for short texts. 
+not currently working :( Leaving the code here for review :)
 
 ```{r,warning=FALSE,message=FALSE,error=FALSE, eval=FALSE}
 rm(lsf_data,post_tokens)
@@ -314,8 +314,8 @@ lsf_data_comments$body <- lsf_data_comments$body %>%
   tolower()
 
 lsf_data_comments <-lsf_data_comments %>%
-  mutate("year" = year(date)) %>% 
-  select(year,body)
+  mutate(id = row_number()) %>% 
+  select(id,body)
 
 set.seed(187187)
 
@@ -323,8 +323,9 @@ set.seed(187187)
 
 ```{r, eval=FALSE}
 
-model <- BTM(lsf_data_comments, k = 10, window = 10, trace = T,iter = 250)
+model <- BTM(lsf_data_comments, k = 10, window = 10, trace = T,iter = 20)
 
+terms(model, top_n = 10)
 
 textplot::textplot_bitermclusters(model)
 
@@ -333,7 +334,11 @@ textplot::textplot_bitermclusters(model)
 
 
 
-# Twitch
+# [Twitch](https://www.twitch.tv/)
+
+
+[dr.k clip](https://clips.twitch.tv/DoubtfulRelentlessKoupreySquadGoals)
+
 
 A glipmse at the data. 
 
@@ -352,7 +357,7 @@ To actually download the twitch chat, I used links from the LSF analysis and the
 
 The Digital Millennium Copyright Act is affecting twitch in a big way. 
 
-Twitch is currenly in hot water with DMCA claims, and they are banning streamers for repeated streaming "copyrighted" songs. One method streamers use to combat this is by deleting their content shortly after it was broadcasted. This affected data collection since the collected twitch clips were being actively taken down.    
+Twitch is currently in hot water with DMCA claims, and they are banning streamers for repeated streaming "copyrighted" songs. One method streamers use to combat this is by deleting their content shortly after it was broadcasted. This affected data collection since the collected twitch clips were being actively taken down.    
 
 This led to the collection of twitch chat from 227 links present in from the reddit posts. 
 
@@ -387,28 +392,26 @@ rm(emote_data_bttv,emote_data_ffz)
 
 This is a data table with the names and images of the top 600 emotes from both sites (BTTV & FFZ) combined. 
 
-
-bttv emotes need to be updated, also not sure if gif emotes work. 
-
-```{r emote datatable,message=FALSE,warning=FALSE}
-
-# https://i.stack.imgur.com/kLMaS.jpg
-
-test<-emote_data %>% mutate("emote_image" = paste("<img src=", emote_link, sep = "")) %>% 
-  mutate(emote_image = paste0(emote_image,' height="52"></img>',sep = "")) %>%  select(emote_name,emote_image)
-
-datatable(test, escape = FALSE)
+<br>
 
 
+```{r}
+
+test<-emote_data %>% mutate("emote_image_link" = emote_link) %>% 
+  mutate(emote_image_link = case_when(
+  is.na(emote_image_link) ~ emote_image,
+  TRUE ~ emote_image_link)) %>% mutate(emote_image_link = paste("<img src=", emote_image_link, sep = "")) %>% 
+  mutate(emote_image_link = paste0(emote_image_link,' height="52"></img>',sep = "")) %>%  select(emote_name,emote_image_link)
+
+datatable(test, escape = FALSE,caption = "Emote names and Photos")
 ```
 
-<br>
 
 ---
 
 ## Descriptions of twitch chat
 
-This chart shows us how many unique chat lines there are per streamer. This metric is useful for understanding which streamers may be getting the most attention during a point in time on LSF (October in this case). This metric should later be controlled for clip length, since longer clips offer more opprotunity for chat engagement.
+This chart shows us how many unique chat lines there are per streamer. This metric is useful for understanding which streamers may be getting the most attention during a point in time on LSF (October in this case). This metric should later be controlled for clip length, since longer clips offer more opportunity for chat engagement.
 
 
 ```{r, fig.width=10}
@@ -425,7 +428,7 @@ data %>% group_by(streamer) %>%  count(sort = T)%>%
 ```
 <br>
 
-This visualization show us the most active twitch chatters in our dataset. In a larger dataset, finding those high-interactcion chatters maybe useful for drawing links between communities or even creating a contributer badges on twith (like the founders badge). 
+This visualization shows us the most active twitch chatters in our dataset. In a larger dataset, finding those high-interaction chatters maybe useful for drawing links between communities or even creating a contributor badges on twitch (like the founders badge).
 
 <br>
 
@@ -446,8 +449,7 @@ data %>% group_by(user) %>% filter(user %notin% c("StreamElements","Streamlabs",
 
 <br>
 
- This plot will give us further insight in the the demographics of the communities of top 5 streamers. This shows the number accounts created by year for each member of the chat by streamer. As an example, one conclusion that may be drawn is that streamers forsen and Mizkif are not attracting new accounts (New user/ban evaders) to their channels. Another conclusion that may be drawn is that Trainwreckstv in 2018, attracted alot of new users, and perhaps played a significant role in bringing new users to twitch. I should investigate futher to understand what happened with train in 2018. This was perhaps his drama year with MitchJones (A popular WOW streamer) or *The Speech*. 
-
+This plot will give us further insight in the demographics of the communities of top 5 streamers. This shows the number accounts created by year for each member of the chat by streamer. As an example, one conclusion that may be drawn is that streamers forsen and Mizkif are not attracting new accounts (New user/ban evaders) to their channels. Another conclusion that may be drawn is that Trainwreckstv in 2018, attracted a lot of new users, and perhaps played a significant role in bringing new users to twitch. I should investigate further to understand what happened with train in 2018. This was perhaps his drama year with MitchJones (A popular WOW streamer) or *The Speech*.
 
 <br>
 
@@ -467,7 +469,7 @@ data %>% filter(streamer %in% top_5_streamers$streamer) %>% mutate(date_year = y
 ```
 <br>
 
-This next vizualization will show the total user chat broken down by streamer for users who were present in more than 4 different chats. I've already filtered out the popular chat bots, but this may be a means of learning about new chat bots that exists, or to uncover community moderators (also present in badges). 
+This next visualization will show the total user chat broken down by streamer for users who were present in more than 4 different chats. I've already filtered out the popular chat bots, but this may be a means of learning about new chat bots that exists, or to uncover community moderators (also present in badges). 
 
 
 ```{r multi-stream chatters,fig.width=10}
@@ -495,7 +497,7 @@ data %>%
 
 ### Bag of words {.tabset .tabset-pills}
 
-Tokens, bigrams and trigrams can give us insign into popular emotes/words combinations and spams that occur in these chats. 
+Tokens, bigrams and trigrams can give us insight into popular emotes/words combinations and spams that occur in these chats.
 
 
 <br>
@@ -563,7 +565,7 @@ data %>%
 
 
 
-As you can see, there are alot of duplicated words/phrases. I like to think of these as spams. 
+As you can see, there are a lot of duplicated words/phrases. I like to think of these as spams. 
 
 Some popular ones are "I was here Pogu I was here Pogu..." or "OMEGALUL OMEGALUL OMEGALUL OMEGALUL..". One way to combat this is by stripping the chat text to only it's unique words. 
 
@@ -604,18 +606,18 @@ head(toptag)
 
 #### Emote Combinations
 
-```{r, warning=FALSE,message=FALSE,error=FALSE}
+```{r, warning=FALSE,message=FALSE,error=FALSE,fig.height= 10, fig.width= 10}
 tag_fcm <- fcm(tags)
 
 toptags_fcm <- fcm_select(tag_fcm, pattern = toptag)
-textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.7, edge_size = 5)
+textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.5, edge_size = 5)
 
 ```
 
 
 #### Emote/word combinations
 
-```{r, warning=FALSE,message=FALSE,error=FALSE}
+```{r, warning=FALSE,message=FALSE,error=FALSE,fig.height=10,fig.width=10}
 
 tags = dfm_select(dfm, pattern = c("£","â","<","ó","ðÿ"),selection = "remove")
 
@@ -627,7 +629,7 @@ toptag = names(topfeatures(tags,20))
 tag_fcm <- fcm(tags)
 
 toptags_fcm <- fcm_select(tag_fcm, pattern = toptag)
-textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.7, edge_size = 5)
+textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.5, edge_size = 5)
 
 ```
 
@@ -672,10 +674,9 @@ viz.bigrams %>%
 
 ### Streamer emote comparisons
 
-With this vizualization, I aimed to uncover the "shared" emotes between streamers/comunties. For example, we can see that the streamer EsfandTv shares alot of emotes with different streamers and may share many community members with TrainwrecksTv.  
+With this visualization, I aimed to uncover the "shared" emotes between streamers/communities. For example, we can see that the streamer EsfandTv shares a lot of emotes with different streamers and may share many community members with TrainwrecksTv.
 
-
-```{r}
+```{r, fig.height= 10, fig.width= 10, warning=FALSE, message=FALSE}
 
 word_cors <- tokens %>%
   group_by(word) %>%
@@ -707,34 +708,23 @@ test<-top_10 %>%
 
 streamers = c("trainwreckstv","esfandtv","forsen","mizkif","ludwig","moonmoon","xqcow","sykkuno","vadikus007","loltyler1")
 
-emote_data_1 <- emote_data %>% select(emote_name,emote_link) %>% na.omit()
+emote_data_1 <- emote_data %>% mutate("emote_image_link" = emote_link) %>% 
+  mutate(emote_image_link = case_when(
+  is.na(emote_image_link) ~ emote_image,
+  TRUE ~ emote_image_link)) %>%  select(emote_name,emote_image_link)
+
 
 # TEST 2
 test_2 <- test %>% left_join(emote_data_1, by = c("item1" = "emote_name"))
 #-------
 
-test <- test %>% graph_from_data_frame()
-test_viz <- toVisNetworkData(test)
-
-test_viz$nodes <- test_viz$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"))
-#test_viz checking the dataframe
-visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
-  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
-  visGroups(groupname = "Emote", color = "blue")%>%
-  visOptions(highlightNearest = list(enabled = T, hover = T))%>%
-  visLegend()
-
-#--------------------
-```
-
-```{r, fig.height= 10, fig.width= 10, warning=FALSE, message=FALSE}
 
 test_2 <- test_2 %>% graph_from_data_frame()
 test_viz_2 <- toVisNetworkData(test_2)
 test_viz_2$nodes <- test_viz_2$nodes %>% mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"),
                                                 "shape" = "image")
 
-test_viz_2$nodes<-test_viz_2$nodes %>% left_join(test_viz_2$edges, by = c('id' = 'from')) %>% select(id,label,group,shape,emote_link) %>% rename(image = emote_link) %>% distinct(id, .keep_all = T) 
+test_viz_2$nodes<-test_viz_2$nodes %>% left_join(test_viz_2$edges, by = c('id' = 'from')) %>% select(id,label,group,shape,emote_image_link) %>% rename(image = emote_image_link) %>% distinct(id, .keep_all = T) 
 
 
 test_viz_2$nodes<-test_viz_2$nodes %>% mutate(image = case_when(id == "xqcow" ~ "https://static-cdn.jtvnw.net/jtv_user_pictures/xqcow-profile_image-9298dca608632101-70x70.jpeg",
@@ -751,7 +741,7 @@ test_viz_2$nodes<-test_viz_2$nodes %>% mutate(image = case_when(id == "xqcow" ~ 
 
 #test_viz_2 checking the dataframe
 visNetwork(nodes = test_viz_2$nodes, edges = test_viz_2$edges, main = "Emote correlation to Streamer")%>%
-  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
+  visGroups(groupname = "Streamer", color = "green", shape = "square", size = 50) %>%
   visGroups(groupname = "Emote", color = "blue")%>%
   visOptions(highlightNearest = list(enabled = T, hover = T))%>%
   visLegend()
@@ -761,31 +751,22 @@ visNetwork(nodes = test_viz_2$nodes, edges = test_viz_2$edges, main = "Emote cor
 ```
 
 
-
-```{}
-
-# delete me at some point
-
-test_viz$edges
-test_viz$nodes
-test_viz$nodes <- test_viz$nodes %>% 
-  mutate("group" = case_when(label %in% streamers ~ "Streamer",TRUE ~ "Emote"),
-                                            "shape" = "image") %>% 
-  inner_join(test_viz$edges, by = c("id" = "from"))# %>%
-  select(c(id,label,group,shape,emote_link))%>%
-  mutate("image" = magick::image_read(emote_link))
-
-
-
-#test_viz checking the dataframe
-visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correlation to Streamer")%>%
-  visGroups(groupname = "Streamer", color = "green", shape = "square") %>%
-  visGroups(groupname = "Emote", color = "blue")%>%
-  visOptions(highlightNearest = list(enabled = T, hover = T))%>%
-  visLegend()
-
-```
-
 <br>
 
+
+# Limitations
+
+I am aware that chat will spam repeated words and emotes, and I considered reducing the chat messages to their unique word in a given chat. This method was used in another paper about twitch chat, but I didn't implement that feature here. Also, when tracking streamer related posts, further examination of the post titles is needed. For example, a post title maybe flagged as "XQC" related but really, the clip features another streamer reacting to an action or statement XQC said.. for example:  *Sweet_Anita reacts to XQC's fail when playing Fortnite*. Finally, this project was intended highlight small and large communities alike. While working on the project, it was clear that I didn't know quite enough about twitch chat and the nuance of emote meanings to uncover the subtle changes between small and large communities.  
+
+<center>
+
+<font size="8">**So what's next?**</font> 
+
+![hmm](https://www.streamscheme.com/wp-content/uploads/2020/09/monkahmm-emote.png)
+
+</center>
+
+I intended to do a emote sentiment analysis for these unique emotes, but I didn't make it that far. I also believe that this data set is not big enough to derive the sentiment for the emotes. Moving forward I will aim to "automate" the data collection, data cleaning, data validation and chat download from LSF and Twitch. The automation will make it so more data is collected with minimal risk of vod/clip deletions. Also, I would like to explore community badges that exists in the dataset (Mods, subcribers and VIPs) for interesting patterns. Finally, a large goal of mine is to incorporate the sentiment analysis of chat (emotes) and the other visualizations from this report into a dashboard that can be updated live or after every broadcast. </font>
+
+![ez](https://cdn.betterttv.net/emote/5590b223b344e2c42a9e28e3/3x) ![clap](https://cdn.betterttv.net/emote/55b6f480e66682f576dd94f5/3x)
 
