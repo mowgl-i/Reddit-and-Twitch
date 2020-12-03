@@ -6,7 +6,6 @@ output:
   html_document:
     toc: true
     toc_float: true
-    toc_depth: 2
     number_sections: true
     code_folding: "hide"
 ---
@@ -25,9 +24,41 @@ One subreddit called LivestreamFail (LSF) is a dedicated subreddit where users s
 
 This analysis will investigate users, posts, and comments (sentiment and topic) on r/LivestreamFail and then investigate the comment data and emote use from twitch clips that were featured in LSF posts. 
 
-*unfold the code block to see which libraries are used*
+<br>
 
-```{r libraries,message=FALSE,error=FALSE,warning=FALSE}
+*Libraries used*
+
+<div class = "row">
+
+
+<div class = "col-md-4">
+
+- tidyverse
+- tidytext
+- tm
+- lubridate
+- stringr 
+- text2vec
+- jsonlite
+- widyr
+</div>
+
+<div class = "col-md-4">
+
+- quanteda
+- visNetwork
+- igraph
+- ggraph
+- DT
+- ggthemes
+- extrafont
+- BTM
+
+</div>
+</div>
+
+
+```{r libraries,message=FALSE,error=FALSE,warning=FALSE,include=FALSE}
 library(pacman)
 
 p_load(tidyverse,
@@ -44,18 +75,267 @@ p_load(tidyverse,
        ggraph,
        DT,
        ggthemes,
-       readtext)
+       readtext,
+       BTM,
+       textplot)
+
+# This creates a !%in% kind of deal
+`%notin%` <- Negate(`%in%`)
+
 
 ```
 
 # r/LivestreamFail
 
-LSF STUFF SHOULD GO HERE. 
+Image credit: [LSF Twitter](https://twitter.com/rlivestreamfail)
 
+## LSF Data Collection
+
+ Using Python, R and Bigquery
+
+- Python
+  * used this to interact with PRAW (The Python Reddit API) that grabbed 'current' posts.
+  * This data is used in the emote(companion) analysis
+
+
+- R
+  * Used to interact with BigqueryR to pull data from the Pushshift reddit dataset which contained historical data from '16. 
+  * Collected Reddit posts and Reddit Comments
+
+<br>
+
+This resulted in over 39k reddit posts and 1.4 M reddit comments. 900 posts were then used in R scrape links and document if the clips had chat available for download. 
+
+```{r, message=FALSE,echo=FALSE}
+
+lsf_data = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data.csv")
+
+lsf_data$titlev1 <- removeWords(lsf_data$title, stopwords("SMART"))
+lsf_data$titlev2 <- gsub("[[:punct:]]","",lsf_data$titlev1)
+lsf_data$titlev3 <- stripWhitespace(lsf_data$titlev2)
+post_tokens <-lsf_data %>% select(titlev3) %>% unnest_tokens(word,"titlev3")
+
+glimpse(lsf_data,width = 50)
+```
+```{r ,message=FALSE, error=FALSE}
+lsf_data_comments = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data_comments.csv")
+
+
+lsf_data_comments$date<-as.POSIXct(lsf_data_comments$date,origin = "1970-01-01")
+
+glimpse(lsf_data_comments[2:1416070,])
+
+# I think we can link the posts to the comments using the posts perma link and the link id for the comments
+# by removing the t*_ before the numbers on link_id
+
+lsf_data$permalink[1]
+lsf_data_comments$link_id[1]
+
+
+rm(lsf_data_comments)
+```
+
+
+## Descriptions of lsf posts
+
+<br>
+
+This is a plot of "Karma" which can be thought of as likes over 3 years on the subreddit. 
+As we can see, there is a growing interest in this subreddit since it's recieved more than 4 times the upvotes in 2019 than in 2016.  
+
+
+```{r,warning=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
+
+lsf_data %>% mutate(year =  as.factor(format(date, "%Y"))) %>% group_by(year) %>% summarize(sum(score)) %>% arrange(year)%>%ungroup()%>% ggplot(aes(x=year, y = `sum(score)`, group = 1))+geom_line()+labs(x = "Year", y ="Sum Score" , title ="Sum of Karma by Year",subtitle = "looks like we have increasing interest in LSF over the years") + theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green") + theme(plot.subtitle = element_text(size = 10))
+
+```
+
+<br>
+
+But does this pattern hold true for every year?
+
+<br>
+
+```{r ,warning=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
+
+lsf_data %>% mutate(month =  as.factor(format(date, "%m")),
+                    year = as.factor(year(date))) %>%
+  group_by(year,month) %>% summarize(sum(score)) %>% arrange(month)%>%ungroup()%>% ggplot(aes(x=month, y = `sum(score)`, group = 1))+geom_line()+
+  labs(x = "Month" , y = "Sum of Posts" , title = "Sum of Karma/Points by month")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+
+  facet_wrap(vars(year))
+
+```
+
+<br>
+
+Yes there is a pattern at the monthly level! there are 2 clear peaks and dips. This information may be useful for streamers or community members to 'farm' clips or strategicly post on the reddit to maximize the oprotunity of karma or views.  
+
+
+This below will show the number of duplicate links that are posted on LSF. 
+
+```{r ,warning=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
+lsf_data %>% group_by(url) %>% count(sort = T)%>% filter(n > 2) %>% ggplot(aes(x = url, y =n, fill = url)) + geom_col()+labs(x = "Link",y ="Number of Posts/Reposts",title ="Number of URL Reposts",subtitle = "Top 10 Links")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+theme(axis.text.x = element_blank(), legend.direction = "vertical", legend.title = element_blank(),axis.line.x = element_blank(),axis.ticks.x = element_blank()  ) + guides(fill = guide_legend(ncol = 3))
+
+```
+
+<br>
+
+which links are being posted on LSF overall?
+
+<br>
+
+```{r ,warning=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
+library(lubridate)
+lsf_data %>% group_by(domain, year(date)) %>% count() %>% filter(n>50)  %>% ggplot(aes(x = `year(date)`, y = n , color = domain ))+
+  geom_line()+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+ theme(legend.title = element_blank(),plot.subtitle = element_text(size = 10))+ labs(title = "Post Links over time.", subtitle = "Filtered for links occuring more than 50 times")
+
+
+```
+
+<br>
+
+
+This next visualization helps me understand which types of media are featured on the subreddit. This is great becaues we can see that alot of these posts are *Twitch* related other than the etika post, who is a famous and beloved youtuber. Also, the keanu reeves moment during his presentation at a gaming convention. 
+
+<br>
+
+```{r ,warning=FALSE, message=FALSE,warning=FALSE, fig.height= 8.5, fig.width=10}
+
+library(ggrepel)
+lsf_data %>% top_n(10,wt=score) %>% filter(score < 60000) %>% ggplot(aes(x = date, y = score, label = title, color = as.factor(score)))+
+  geom_point(show.legend = F)+
+  geom_label_repel(size = 3, vjust ="inward", hjust ='inward',show.legend = F, nudge_y = 10)+
+  theme_wsj(base_size = 10,color = "green",base_family = "Segoe Print")+
+  labs(title  = "Top 10 upvoted posts by date",caption = "Twitch, youtube, games and memes")+ theme(plot.caption = element_text(size = 10)) 
+
+```
+
+<br>
+
+### User posts {.tabset .tabset-pills}
+
+#### Number of posts
+
+Normiesree has a suspisous amount of posts! Could they be reposts? Are they legit posts? perhaps he's the oldest surviving member of "top posters" on lsf, since many users were [deleted]. 
+
+```{r , message=FALSE, warning=FALSE, fig.height= 8.5, fig.width=10}
+
+lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% count(sort =T) %>% ungroup() %>% top_n(10) %>% ggplot(aes(x = reorder(author,n), y =n)) + geom_col()+
+coord_flip()+labs(x = "Author",y ="Number of Posts",title ="Which users post the most?",subtitle = "Top 10 users")+ theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
+
+
+```
+
+#### Top Karma'd users
+
+  
+```{r ,warning=FALSE, message=FALSE, fig.height= 8.5, fig.width=10}
+
+lsf_data %>% group_by(author) %>% filter(author != "[deleted]") %>% summarize(sum(score)) %>%top_n(10) %>% ggplot(aes(x = reorder(author,`sum(score)`), y =`sum(score)`))+
+  geom_col()+
+  coord_flip()+
+  labs(y ="Total Score",x = "User",title = "Top upvoted redditors",subtitle = "Top 10 users")+
+  theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")
+
+```
+
+
+```{r, fig.width=10,fig.height=8, message=FALSE, warning=FALSE}
+lsf_data %>%mutate(month =  as.factor(format(date, "%m")),
+                    year = as.factor(year(date))) %>% group_by(author,month, year) %>% 
+  filter(author != "[deleted]") %>% 
+  summarize("total score" = sum(score)) %>%
+  ungroup() %>%
+  filter(author %in% c("-eDgAR-","Normiesreeee69","bbranddon","moody420","TTVRaptor")) %>%
+  filter(year != c("2016","2017")) %>% 
+  ggplot(aes(x = month, y =`total score`, color = author, group = author))+
+  geom_line(size = 3, alpha = 0.6)+
+  #labs(y ="Total Score",x = "User",title = "Top upvoted redditors",subtitle = "Top 10 users")+
+  theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+
+  facet_wrap(vars(year), strip.position = "bottom")+
+   theme(legend.title = element_blank(),legend.position = "bottom")+
+  labs(title = "Reddit karma over time for popular users")
+
+
+```
+
+
+
+### {-}
+
+
+
+
+```{r, fig.width=10,fig.height=8, message=FALSE, warning=FALSE}
+# This creates a !%in% kind of deal
+`%notin%` <- Negate(`%in%`)
+
+
+lsf_data %>% 
+  filter(str_detect(titlev3, regex("xqc|xqcow|train|trainwrecks|trainwrecks|trainwreckstv|forsen|esfand|esfandtv|ludwig|mizkif", ignore_case = T))) %>% 
+  mutate("streamer" = case_when(
+    str_detect(titlev3, regex("xqc|xqcow",ignore_case = T)) ~ "xQcOw",
+    str_detect(titlev3, regex("train|trainwrecks|trainwrecks|trainwreckstv",ignore_case = T)) ~ "TrainwrecksTv",
+    str_detect(titlev3, regex("forsen",ignore_case = T)) ~ "forsen",
+    str_detect(titlev3, regex("esfand|esfandtv",ignore_case = T)) ~ "EsfandTv",
+    str_detect(titlev3, regex("ludwig",ignore_case = T)) ~ "Ludwig",
+    str_detect(titlev3, regex("mizkif",ignore_case = T)) ~ "Mizkif")) %>% 
+  group_by(streamer, ) %>% mutate(month =  as.factor(format(date, "%m")),
+                    year = as.factor(year(date))) %>% 
+   group_by(year,month,streamer) %>% summarize("total score" = sum(score)) %>%  ungroup() %>%
+   filter(year %notin% c("2016","2017")) %>% 
+  ggplot(aes(x=month, y = `total score`, group = streamer,color = streamer))+geom_line(size = 2,alpha = 0.7)+
+  facet_wrap(vars(year),nrow = 1, ncol = 4,strip.position = "bottom") + theme_wsj(base_size = 9,base_family = "Segoe Print",color = "green")+ theme(legend.title = element_blank(),legend.position = "bottom")+
+  labs(title = "Karma over time for posts containing 'relevant' streamers")
+  
+
+```
+
+<br>
+
+## Comments: Biterm Topic modeling for short texts. 
+not currently working
+
+```{r,warning=FALSE,message=FALSE,error=FALSE, eval=FALSE}
+rm(lsf_data,post_tokens)
+
+lsf_data_comments = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data_comments.csv")
+
+
+lsf_data_comments$date<-as.POSIXct(lsf_data_comments$date,origin = "1970-01-01")
+
+lsf_data_comments %>%  glimpse()
+
+lsf_data_comments$body <- lsf_data_comments$body %>%
+  removeWords(stopwords("smart")) %>% 
+  removePunctuation() %>%
+  removeNumbers() %>% 
+  stripWhitespace() %>% 
+  tolower()
+
+lsf_data_comments <-lsf_data_comments %>%
+  mutate("year" = year(date)) %>% 
+  select(year,body)
+
+set.seed(187187)
+
+```
+
+```{r, eval=FALSE}
+
+model <- BTM(lsf_data_comments, k = 10, window = 10, trace = T,iter = 250)
+
+
+textplot::textplot_bitermclusters(model)
+
+
+```
 
 
 
 # Twitch
+
+A glipmse at the data. 
 
 ```{r putting the clips together,message=FALSE,error=FALSE,warning=FALSE}
 data <- read_csv("C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/chats.csv",col_types = cols(X1 = col_skip()))
@@ -68,10 +348,7 @@ glimpse(data)
 
 **tl;dr - twich dmca issues, streamer bans, and the app I used prevented me from downloading alot more data. Next time, I'll work with the twitch api directly.**
 
-
-Reddit data was gathered using python and PRAW (Python Reddit API Wrapper) to gather recent data from r/LivestreamFail (October 2020). This resulted in over 900 reddit posts. This data was then used in R scrape links and document if the clips had chat available for download. 
-
-To actually download the twitch chat, I used application by lay295 and zigagrcar on github found [here](https://github.com/lay295/TwitchDownloader). 
+To actually download the twitch chat, I used links from the LSF analysis and the application by lay295/zigagrcar on github found [here](https://github.com/lay295/TwitchDownloader). 
 
 The Digital Millennium Copyright Act is affecting twitch in a big way. 
 
@@ -154,9 +431,6 @@ This visualization show us the most active twitch chatters in our dataset. In a 
 
 ```{r, fig.width=10}
 
-# This creates a !%in% kind of deal
-`%notin%` <- Negate(`%in%`)
-
 data %>% group_by(user) %>% filter(user %notin% c("StreamElements","Streamlabs","Nightbot")) %>%  count(sort = T) %>%
   head(n=10)%>% 
   ggplot(aes(x = reorder(user,-n), y = n))+
@@ -191,10 +465,12 @@ data %>% filter(streamer %in% top_5_streamers$streamer) %>% mutate(date_year = y
 
 
 ```
-
 <br>
 
-```{r multi-stream chatters}
+This next vizualization will show the total user chat broken down by streamer for users who were present in more than 4 different chats. I've already filtered out the popular chat bots, but this may be a means of learning about new chat bots that exists, or to uncover community moderators (also present in badges). 
+
+
+```{r multi-stream chatters,fig.width=10}
 data %>% 
   add_count(user,streamer) %>% 
   filter(n>1,user %notin% c("StreamElements","Streamlabs","Nightbot","Fossabot")) %>% 
@@ -206,11 +482,16 @@ data %>%
   filter(n >=20) %>% 
   add_count(user,streamer,name = "#_chat_per_clip") %>% 
   ggplot(aes(x = user, y = `#_chat_per_clip`, fill = streamer))+
-  geom_bar(position = "stack",stat = "identity")
+  geom_bar(position = "stack",stat = "identity") + 
+  theme_wsj(base_size = 12, color = "green")+
+  theme(legend.title = element_blank(),legend.position = "bottom")+
+  labs(title = "multi-stream chatters")
+
 
 ```
 
 <br>
+
 
 ### Bag of words {.tabset .tabset-pills}
 
@@ -350,7 +631,7 @@ textplot_network(toptags_fcm,min_freeq = 0.1, edge_alpha = 0.7, edge_size = 5)
 
 ```
 
-###{-}
+### {-}
 
 ### Directed Bi-gram network
 
@@ -504,4 +785,7 @@ visNetwork(nodes = test_viz$nodes, edges = test_viz$edges, main = "Emote correla
   visLegend()
 
 ```
+
+<br>
+
 
