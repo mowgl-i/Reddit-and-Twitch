@@ -20,6 +20,9 @@ AND score > 40
  
  "
 
+
+# authenticate your bigquery/gcp creds
+
 bq_auth(email = "****")
 
 

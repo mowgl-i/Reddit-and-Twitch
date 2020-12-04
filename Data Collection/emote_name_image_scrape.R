@@ -1,7 +1,9 @@
 library(pacman)
 p_load(tidyverse,rvest,RSelenium,XML)
 
-setwd("~/MSIA-19/Git/Reddit-and-Twitch/Data Collection")
+
+# set working directory to Reddit-and-Twitch/Data Collection
+setwd("~/****/Reddit-and-Twitch/Data Collection")
 
 
 ########## FFZ EMOTES ################
