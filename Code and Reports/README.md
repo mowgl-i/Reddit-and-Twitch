@@ -16,3 +16,7 @@ The data you'll need to run this file is:
   - ffz_emotes.csv
   
   if you don't want to run any of the code, simply open the html render. 
+
+find it here :)
+
+![](https://rpubs.com/mowgli/lsfandtwitch)
