@@ -106,7 +106,7 @@ This resulted in over 39k reddit posts and 1.4 M reddit comments. 900 posts were
 
 ```{r, message=FALSE,echo=FALSE,warning=FALSE}
 
-lsf_data = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data.csv")
+lsf_data = read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/lsf_data.csv")
 
 lsf_data$titlev1 <- removeWords(lsf_data$title, stopwords("SMART"))
 lsf_data$titlev2 <- gsub("[[:punct:]]","",lsf_data$titlev1)
@@ -115,8 +115,9 @@ post_tokens <-lsf_data %>% select(titlev3) %>% unnest_tokens(word,"titlev3")
 
 glimpse(lsf_data,width = 50)
 ```
+
 ```{r ,message=FALSE, error=FALSE}
-lsf_data_comments = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data_comments.csv")
+lsf_data_comments = read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/lsf_data_comments.csv")
 
 
 lsf_data_comments$date<-as.POSIXct(lsf_data_comments$date,origin = "1970-01-01")
@@ -299,7 +300,7 @@ not currently working :( Leaving the code here for review :)
 ```{r,warning=FALSE,message=FALSE,error=FALSE, eval=FALSE}
 rm(lsf_data,post_tokens)
 
-lsf_data_comments = read_csv("C:/Users/macia/Documents/MSIA-19/Git/MSIA-21-/Network Analysis/lsf_data_comments.csv")
+lsf_data_comments = read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/lsf_data_comments.csv")
 
 
 lsf_data_comments$date<-as.POSIXct(lsf_data_comments$date,origin = "1970-01-01")
@@ -343,7 +344,7 @@ textplot::textplot_bitermclusters(model)
 A glipmse at the data. 
 
 ```{r putting the clips together,message=FALSE,error=FALSE,warning=FALSE}
-data <- read_csv("C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/chats.csv",col_types = cols(X1 = col_skip()))
+data <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/chats.csv",col_types = cols(X1 = col_skip()))
 
 head(data, n = 10)
 glimpse(data)
@@ -370,9 +371,9 @@ R and Rselenium was used to scrape the emote data from [FrankerFaceZ](https://ww
 
 # gotta change these tokens :(, maybe have a git auth? This data is being read from github, and uses git lfs. 
 
-emote_data_bttv <- read_csv("C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/bttv_emotes.csv") 
+emote_data_bttv <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/bttv_emotes.csv") 
 
-emote_data_ffz <- read_csv("C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/ffz_emotes.csv")
+emote_data_ffz <- read_csv("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/ffz_emotes.csv")
 
 emote_data <- emote_data_ffz %>% full_join(emote_data_bttv, by = "emote_name") %>% select(-c(X1.x,X1.y)) %>% distinct(emote_name,.keep_all = T)%>% 
   mutate(emote_name = str_to_lower(emote_name))
@@ -578,7 +579,7 @@ Some popular ones are "I was here Pogu I was here Pogu..." or "OMEGALUL OMEGALUL
 ```{r,warning=FALSE,error=FALSE,message=FALSE , tidy=TRUE}
 
 
-corpus_data <- readtext("C:/Users/macia/Documents/MSIA-19/Git/Reddit-and-Twitch/Data Collection/corpus_data.csv", text_field = 'text')
+corpus_data <- readtext("https://media.githubusercontent.com/media/mowgl-i/Reddit-and-Twitch/master/Data%20Collection/corpus_data.csv", text_field = 'text')
 glimpse(corpus_data)
 
 
